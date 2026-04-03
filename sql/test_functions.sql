@@ -30,9 +30,20 @@ insert into tbl_er_desc(id, info) values (1, 'pai');
 insert into tbl_er_desc(id, info) values (2, 'mãe');
 insert into tbl_er_desc values (3, 'filho');
 insert into tbl_er_desc values (4, 'filha');
+insert into tbl_er_desc values (5, 'irmao');
+insert into tbl_er_desc values (6, 'conjuge');
 
 
 insert into tbl_p_detail select generate_series(1,10000);  
+
+insert into tbl_er values (10, 11, 6, now()); --10 conjuge 11;
+insert into tbl_er values (10, 12, 1, now()); --10 pai 12
+insert into tbl_er values (12, 10, 3, now()); -- 12 filho 10
+insert into tbl_er values (10, 13, 5, now()); --10 irmao 13
+insert into tbl_er values (13, 14, 1, now()); --13 pai 14
+insert into tbl_er values (14, 13, 4, now()); -- 14 filha 13
+insert into tbl_er values (14, 12, 6, now()); --14 conjuge 12
+
 insert into tbl_er values (1,2,1,now());  -- For example, 1 is the father of 2  
 insert into tbl_er values (2,1,4,now());   -- For example, 2 is the daughter of 1  
   
@@ -94,7 +105,13 @@ WITH RECURSIVE search_graph(
           g.c2,                              -- point 2        
           g.prop,                            -- edge property        
       g.prop::text as all_prop,          -- properties of all edges  
-          1 depth,                           -- initial depth=1        
+                 CASE 
+            WHEN g.prop = 6 or g.prop = 5 THEN 0                            -- initial depth=1        
+            ELSE 1
+          END AS depth,   CASE 
+            WHEN g.prop = 6 or g.prop = 5 THEN 0                            -- initial depth=1        
+            ELSE 1
+          END AS depth,
           ARRAY[g.c1, g.c2] path             -- initial path        
         FROM tbl_er AS g         
         WHERE         
@@ -108,7 +125,10 @@ WITH RECURSIVE search_graph(
           g.c2,                              -- point 2        
           g.prop,                            -- edge property     
       sg.all_prop || g.prop::text as all_prop,    -- properties of all edges  
-          sg.depth + 1 depth,                   -- depth +1        
+          CASE
+            WHEN g.prop = 6 or g.prop = 5 THEN sg.depth
+            ELSE sg.depth + 1
+          END AS depth,                   -- depth +1        
           sg.path || g.c2 path                 -- Add a new point to the path        
         FROM tbl_er AS g, search_graph AS sg    -- circular INNER JOIN        
         WHERE         
@@ -130,7 +150,7 @@ $$
  language plpgsql strict;   
 
 
-select * from graph_search1(1);
+select * from graph_search1(10);
 
 -- 2.  Define a similar search function and return cursors. 
 -- (Because number of relationships on a family pedigree is not very large, 
@@ -235,7 +255,10 @@ WITH RECURSIVE search_graph(
           g.c1,   -- point 1        
           g.c2,   -- point 2        
           g.prop::text,   -- edge property        
-          1 depth,        -- initial depth =1        
+          CASE 
+            WHEN g.prop = 6 or g.prop = 5 THEN 0                            -- initial depth=1        
+            ELSE 1
+          END AS depth,     
           ARRAY[g.c1, g.c2] path             -- initial path        
         FROM tbl_er AS g         
         WHERE         
@@ -245,7 +268,10 @@ WITH RECURSIVE search_graph(
           g.c1,    -- point 1        
           g.c2,    -- point 2        
           sg.prop::text || g.prop::text,          -- edge property        
-          sg.depth + 1 as depth,    -- depth + 1        
+          CASE
+            WHEN g.prop = 6 or g.prop = 5 THEN sg.depth
+            ELSE sg.depth + 1
+          END AS depth,                   -- depth +1         
           sg.path || g.c2 path                 -- Add a new point to the path      
         FROM tbl_er AS g, search_graph AS sg   -- circular INNER JOIN        
         WHERE         
@@ -270,5 +296,5 @@ end;
 $$
  language plpgsql strict;
 
- select * from graph_search3(1,2);
+ select * from graph_search3(10,14);
  select * from graph_search3(1,5); 
