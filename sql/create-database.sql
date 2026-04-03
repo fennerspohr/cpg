@@ -26,6 +26,7 @@ CREATE TABLE Tipo_Relacao(
 );
 
 CREATE TABLE Relacao(
+    id SERIAL PRIMARY KEY,
     p1 INT REFERENCES Pessoa(id),
     p2 INT REFERENCES Pessoa(id),
     rel INT REFERENCES Tipo_Relacao(id),
