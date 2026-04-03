@@ -28,7 +28,7 @@ CREATE TABLE Tipo_Relacao(
 CREATE TABLE Relacao(
     p1 INT REFERENCES Pessoa(id),
     p2 INT REFERENCES Pessoa(id),
-    prop INT REFERENCES Tipo_Relacao(id),
+    rel INT REFERENCES Tipo_Relacao(id),
     metadata JSONB,
     creation_time TIMESTAMP,
     constraint p_diff check (p1<>p2),
