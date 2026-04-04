@@ -43,6 +43,7 @@ insert into tbl_er values (10, 13, 5, now()); --10 irmao 13
 insert into tbl_er values (13, 14, 1, now()); --13 pai 14
 insert into tbl_er values (14, 13, 4, now()); -- 14 filha 13
 insert into tbl_er values (14, 12, 6, now()); --14 conjuge 12
+insert into tbl_er values (12, 14, 6, now()) -- 12 conjuge 14
 
 insert into tbl_er values (1,2,1,now());  -- For example, 1 is the father of 2  
 insert into tbl_er values (2,1,4,now());   -- For example, 2 is the daughter of 1  
@@ -150,7 +151,7 @@ $$
  language plpgsql strict;   
 
 
-select * from graph_search1(10);
+select * from graph_search1(1);
 
 -- 2.  Define a similar search function and return cursors. 
 -- (Because number of relationships on a family pedigree is not very large, 

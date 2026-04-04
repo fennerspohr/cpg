@@ -73,3 +73,11 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+NUXT HUB:
+https://hub.nuxt.com/docs/getting-started/installation
+
+DRIZZLE:
+https://hub.nuxt.com/docs/database
+
+Pra conectar ao banco é preciso ter um arquivo .env na pasta root do projeto com o a URL da Database
