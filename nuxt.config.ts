@@ -1,12 +1,44 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
-  runtimeConfig: {
-    databaseUrl: process.env.DATABASE_URL,
-  },
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ['@nuxthub/core'],
-  hub: {
-    db: 'postgresql'
-  }
-})
+
+  // 1. REGISTRE OS MÓDULOS AQUI PRIMEIRO
+  modules: [
+    '@nuxthub/core',
+    '@nuxt/icon'
+  ],
+
+  css: ['~/assets/css/main.css'],
+
+  // 2. AGORA O TS VAI RECONHECER O 'icon' AQUI EMBAIXO
+  icon: {
+    serverBundle: 'local',
+  },
+
+  app: {
+    head: {
+      htmlAttrs: {
+        'data-theme': 'nostalgia'
+      }
+    }
+  },
+
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+      ]
+    },
+    server: {
+      watch: {
+        usePolling: true
+      }
+    }
+  },
+});

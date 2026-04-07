@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@plugin "daisyui/theme" {
+  name: "nostalgia";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+}
+@theme{
+  /* fundo */
+  --color-base-100: #d4d0c8; 
+  /* destaque */
+  --color-base-200: #e0ddd8; 
+  /* cor das bordas */
+  --color-base-300: #808080;
+  /* cor do texto principal */
+  --color-base-content: oklch(20% 0.01 240); 
+
+  /* azul */
+  --color-primary: #0a246a; 
+
+  --color-male: #2da9da;
+  --color-female: #ffb6c1;
+
+  /* quadrados */
+  --radius-selector: 0rem;
+  --radius-field: 0rem;
+  --radius-box: 0rem;
+}
+
+:root {
+  display: block};
