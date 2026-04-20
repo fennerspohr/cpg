@@ -1,35 +1,36 @@
 import { sql } from "drizzle-orm";
 import { pgTable, unique, check, index, text, serial, timestamp, varchar, char, date , integer, jsonb} from 'drizzle-orm/pg-core'
 
-export const local = pgTable('Local', {
+export const local = pgTable('local', {
     id: serial().primaryKey(),
     descricao: varchar({length: 100})
 });
 
-export const pessoa = pgTable('Pessoa', {
+export const pessoa = pgTable('pessoa', {
   id: serial().primaryKey(),
   nome: varchar({length: 100}),
+  sobrenome: varchar({length:100}),
   sexo: char({length:1}),
-  dataNasc: date(),
-  localNasc: integer("localNasc_id").references(() => local.id),
-  dataBatismo: date(),
-  localBatismo: integer("localBatismo_id").references(() => local.id),
-  dataMorte: date(),
-  localMorte: integer("localMorte_id").references(() => local.id),
+  datanasc: date(),
+  localnasc: integer().references(() => local.id),
+  databatismo: date(),
+  localbatismo: integer().references(() => local.id),
+  datamorte: date(),
+  localmorte: integer().references(() => local.id),
   obs: text(),
   creation_time: timestamp().notNull().defaultNow()
 });
 
-export const tipo_relacao = pgTable('Tipo_Relacao', {
+export const tipo_relacao = pgTable('tipo_relacao', {
     id: serial().primaryKey(),
     descricao: varchar({length: 100})
 });
 
-export const relacao = pgTable('Relacao', {
+export const relacao = pgTable('relacao', {
     id: serial().primaryKey(),
-    p1: integer("p1_id").references(() => pessoa.id),
-    p2: integer("p2_id").references(() => pessoa.id),
-    rel: integer("rel_id").references(() => tipo_relacao.id),
+    p1: integer().references(() => pessoa.id),
+    p2: integer().references(() => pessoa.id),
+    rel: integer().references(() => tipo_relacao.id),
     metadata: jsonb(),
     creation_time: timestamp().notNull().defaultNow()
 }, (t) => [
