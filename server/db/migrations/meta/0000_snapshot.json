@@ -1,0 +1,330 @@
+{
+  "id": "ba4d5d41-b5a3-41ba-93a1-3d25774c1f4f",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.local": {
+      "name": "local",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pessoa": {
+      "name": "pessoa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sobrenome": {
+          "name": "sobrenome",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sexo": {
+          "name": "sexo",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "datanasc": {
+          "name": "datanasc",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "localnasc": {
+          "name": "localnasc",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "databatismo": {
+          "name": "databatismo",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "localbatismo": {
+          "name": "localbatismo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "datamorte": {
+          "name": "datamorte",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "localmorte": {
+          "name": "localmorte",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "obs": {
+          "name": "obs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creation_time": {
+          "name": "creation_time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pessoa_localnasc_local_id_fk": {
+          "name": "pessoa_localnasc_local_id_fk",
+          "tableFrom": "pessoa",
+          "tableTo": "local",
+          "columnsFrom": [
+            "localnasc"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pessoa_localbatismo_local_id_fk": {
+          "name": "pessoa_localbatismo_local_id_fk",
+          "tableFrom": "pessoa",
+          "tableTo": "local",
+          "columnsFrom": [
+            "localbatismo"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pessoa_localmorte_local_id_fk": {
+          "name": "pessoa_localmorte_local_id_fk",
+          "tableFrom": "pessoa",
+          "tableTo": "local",
+          "columnsFrom": [
+            "localmorte"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.relacao": {
+      "name": "relacao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "p1": {
+          "name": "p1",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p2": {
+          "name": "p2",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rel": {
+          "name": "rel",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creation_time": {
+          "name": "creation_time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_relacao_p1": {
+          "name": "idx_relacao_p1",
+          "columns": [
+            {
+              "expression": "p1",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_relacao_p2": {
+          "name": "idx_relacao_p2",
+          "columns": [
+            {
+              "expression": "p2",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "relacao_p1_pessoa_id_fk": {
+          "name": "relacao_p1_pessoa_id_fk",
+          "tableFrom": "relacao",
+          "tableTo": "pessoa",
+          "columnsFrom": [
+            "p1"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "relacao_p2_pessoa_id_fk": {
+          "name": "relacao_p2_pessoa_id_fk",
+          "tableFrom": "relacao",
+          "tableTo": "pessoa",
+          "columnsFrom": [
+            "p2"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "relacao_rel_tipo_relacao_id_fk": {
+          "name": "relacao_rel_tipo_relacao_id_fk",
+          "tableFrom": "relacao",
+          "tableTo": "tipo_relacao",
+          "columnsFrom": [
+            "rel"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "p_unique": {
+          "name": "p_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "p1",
+            "p2"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "p_diff": {
+          "name": "p_diff",
+          "value": "{$t.p1} <> {$t.p2}"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.tipo_relacao": {
+      "name": "tipo_relacao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
