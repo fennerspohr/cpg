@@ -6,11 +6,6 @@ export { sql, eq, and, or, like } from 'drizzle-orm'
 
 export const tables = schema
 
-const { Pool } = pg;
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL!,
-})
+const sql =  process.env.DATABASE_URL!;
 
-export function useDatabase() {
-  return drizzle(pool, { schema })
-}
+export const db = drizzle(sql, {schema});
