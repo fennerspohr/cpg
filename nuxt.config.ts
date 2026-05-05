@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
+  runtimeConfig: {
+    // As variáveis aqui ficam disponíveis apenas no servidor
+    databaseUrl: process.env.DATABASE_URL 
+  },
+
   // 1. REGISTRE OS MÓDULOS AQUI PRIMEIRO
   modules: [
     '@nuxthub/core',

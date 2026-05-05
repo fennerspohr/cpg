@@ -3,7 +3,8 @@ import { pgTable, unique, check, index, text, serial, timestamp, varchar, char, 
 
 export const local = pgTable('local', {
     id: serial().primaryKey(),
-    descricao: varchar({length: 100})
+    descricao: varchar({length: 100}),
+    estado: varchar({length: 100})
 });
 
 export const pessoa = pgTable('pessoa', {

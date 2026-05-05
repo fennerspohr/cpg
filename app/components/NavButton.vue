@@ -1,14 +1,21 @@
-<!--design do botão-->
 <template>
-  <!-- o componente é um link se 'to' for fornecido, caso contrário é um botão normal -->
-  <component
-    :is="to ? 'NuxtLink' : 'button'"
+  <NuxtLink
+    v-if="to"
     :to="to"
     class="nav-btn group"
   >
     <Icon :name="icon" class="icon-style" :class="iconClass" />
     <span class="label-style">{{ label }}</span>
-  </component>
+  </NuxtLink>
+
+  <button
+    v-else
+    type="button"
+    class="nav-btn group"
+  >
+    <Icon :name="icon" class="icon-style" :class="iconClass" />
+    <span class="label-style">{{ label }}</span>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -30,7 +37,6 @@ defineProps<{
          active:border-r-white active:border-b-white;
 }
 
-/*efeito pro icon ficar menor quando clicado*/
 .icon-style {
   @apply text-2xl transition-transform group-active:scale-90;
 }
