@@ -1,3 +1,18 @@
+# To do
+
+- [x] Banco de dados;
+- [x] Página de criação de pessoa;
+  - [ ] Adicionar relação + criar nova pessoa (só nome, sobrenome e sexo) para adicionar relação;
+  - [ ] Adicionar local;
+- [ ] Visualização em lista de pessoas;
+  - [ ] Pesquisar por nome, sobrenome;
+- [ ] Visualizar pessoa;
+- [ ] Visualização em árvore;
+- [ ] Buscar relação entre duas pessoas (função twopoint_search);
+- [ ] Botão de backup (download de arquivos do postgres);
+- [ ] Relatório;
+- [ ] Manual de uso;
+
 # Nuxt Minimal Starter
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
