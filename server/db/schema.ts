@@ -3,14 +3,14 @@ import { pgTable, unique, check, index, text, serial, timestamp, varchar, char, 
 
 export const local = pgTable('local', {
     id: serial().primaryKey(),
-    descricao: varchar({length: 100}),
+    descricao: varchar({length: 100}).notNull(),
     estado: varchar({length: 100})
 });
 
 export const pessoa = pgTable('pessoa', {
   id: serial().primaryKey(),
-  nome: varchar({length: 100}),
-  sobrenome: varchar({length:100}),
+  nome: varchar({length: 100}).notNull(),
+  sobrenome: varchar({length:100}).notNull(),
   sexo: char({length:1}),
   datanasc: date(),
   localnasc: integer().references(() => local.id),
@@ -24,14 +24,14 @@ export const pessoa = pgTable('pessoa', {
 
 export const tipo_relacao = pgTable('tipo_relacao', {
     id: serial().primaryKey(),
-    descricao: varchar({length: 100})
+    descricao: varchar({length: 100}).notNull()
 });
 
 export const relacao = pgTable('relacao', {
     id: serial().primaryKey(),
-    p1: integer().references(() => pessoa.id),
-    p2: integer().references(() => pessoa.id),
-    rel: integer().references(() => tipo_relacao.id),
+    p1: integer().references(() => pessoa.id).notNull(),
+    p2: integer().references(() => pessoa.id).notNull(),
+    rel: integer().references(() => tipo_relacao.id).notNull(),
     metadata: jsonb(),
     creation_time: timestamp().notNull().defaultNow()
 }, (t) => [
