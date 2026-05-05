@@ -1,25 +1,25 @@
 <template>
   <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-    <div class="w-full max-w-lg bg-[#d4d0c8] border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] shadow-[2px_2px_10px_rgba(0,0,0,0.5)]" >
+    <div class="w-full max-w-lg bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 shadow-[2px_2px_10px_rgba(0,0,0,0.5)]" >
       
-      <div class="bg-[#0a246a] px-2 py-1 flex items-center justify-between mx-0.5 mt-0.5">
+      <div class="bg-primary px-2 py-1 flex items-center justify-between mx-0.5 mt-0.5">
         <span class="text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2">
           <Icon name="lucide:map-pin" class="text-sm" />
           Gerenciador de Localidades
         </span>
-        <button @click="$emit('close')" class="bg-[#d4d0c8] border border-t-white border-l-white border-r-black border-b-black w-4 h-4 flex items-center justify-center text-xs pb-0.5 leading-none shadow-sm hover:bg-[#e0e0e0] active:border-t-black active:border-l-black active:border-r-white active:border-b-white">
+        <button @click="$emit('close')" class="bg-base-100 border border-t-white border-l-white border-r-black border-b-black w-4 h-4 flex items-center justify-center text-xs pb-0.5 leading-none shadow-sm hover:bg-[#e0e0e0] active:border-t-black active:border-l-black active:border-r-white active:border-b-white">
           ×
         </button>
       </div>
 
-      <div class="p-4 bg-[#d4d0c8] space-y-3">
+      <div class="p-4 bg-base-100 space-y-3">
         <div>
           <label class="text-[10px] font-bold uppercase block mb-1">Nome da cidade:</label>
           <input 
             v-model="filtro" 
             type="text" 
             placeholder="Ex: Santa Maria"
-            class="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-r-white border-b-white p-1.5 text-sm outline-none focus:bg-[#ffffcc]"
+            class="w-full bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white p-1.5 text-sm outline-none focus:bg-[#ffffcc]"
           />
         </div>
         
@@ -28,7 +28,7 @@
             <label class="text-[10px] font-bold uppercase block mb-1">Estado (UF):</label>
             <select 
               v-model="estado" 
-              class="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-r-white border-b-white p-1.5 text-sm outline-none focus:bg-[#ffffcc]"
+              class="w-full bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white p-1.5 text-sm outline-none focus:bg-[#ffffcc]"
             >
               <option value="">Nenhum</option>
               <option v-for="uf in estadosBrasileiros" :key="uf" :value="uf">{{ uf }}</option>
@@ -39,7 +39,7 @@
             <button 
               @click="salvarLocal"
               :disabled="!filtro || carregando || jaExiste"
-              class="w-full border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white bg-[#d4d0c8] text-xs py-2 font-bold disabled:opacity-50"
+              class="w-full border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white bg-base-100 text-xs py-2 font-bold disabled:opacity-50"
             >
               {{ jaExiste ? 'Já cadastrada' : 'Adicionar' }}
             </button>
@@ -52,23 +52,23 @@
       </div>
 
       <div class="px-2 pb-2">
-        <div class="bg-[#d4d0c8] border-x border-t border-[#808080] px-2 py-1 text-[10px] font-bold uppercase flex justify-between">
+        <div class="bg-base-100 border-x border-t border-base-300 px-2 py-1 text-[10px] font-bold uppercase flex justify-between">
           <span>Lista de Cidades</span>
           <span>{{ locaisFiltrados.length }} registro(s)</span>
         </div>
         
-        <div class="bg-white border-2 border-t-[#808080] border-l-[#808080] border-r-white border-b-white h-64 overflow-auto">
+        <div class="bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white h-64 overflow-auto">
           <table class="w-full text-left text-sm border-collapse">
-            <thead class="sticky top-0 bg-[#d4d0c8] text-[9px] font-bold uppercase border-b border-[#808080]">
+            <thead class="sticky top-0 bg-base-100 text-[9px] font-bold uppercase border-b border-base-300">
               <tr>
-                <th class="p-1.5 border-r border-[#808080] w-10 text-center">ID</th>
+                <th class="p-1.5 border-r border-base-300 w-10 text-center">ID</th>
                 <th class="p-1.5">Descrição</th>
                 <th class="p-1.5 w-16 text-center">UF</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="l in locaisFiltrados" :key="l.id" 
-                class="border-b border-gray-100 hover:bg-[#0a246a] hover:text-white group cursor-default">
+                class="border-b border-gray-100 hover:bg-primary hover:text-white group cursor-default">
                 <td class="p-1.5 border-r border-gray-200 text-center font-mono text-xs text-gray-500 group-hover:text-white">
                   {{ l.id }}
                 </td>
@@ -87,9 +87,9 @@
         </div>
       </div>
 
-      <div class="p-2 flex justify-between items-center bg-[#d4d0c8]">
+      <div class="p-2 flex justify-between items-center bg-base-100">
         <span class="text-[9px] text-gray-600">CPG - Banco de Dados Geográfico</span>
-        <button @click="$emit('close')" class="border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white bg-[#d4d0c8] text-xs py-1 px-6">
+        <button @click="$emit('close')" class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white bg-base-100 text-xs py-1 px-6">
           Fechar
         </button>
       </div>
