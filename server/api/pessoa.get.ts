@@ -1,6 +1,7 @@
 import { db } from '../utils/drizzle';
 import { pessoa } from "../db/schema"
-import { desc, ilike } from 'drizzle-orm';
+import { desc, ilike, sql } from 'drizzle-orm';
+
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -12,7 +13,10 @@ export default defineEventHandler(async (event) => {
   if(nome){ //pesquisa por nome
     return await db.select()
       .from(pessoa)
-      .where(sql`${pessoa.nome} || ' ' || ${pessoa.sobrenome} like '%' || ${nome} || '%'`);
+     .where(
+        // ilike para busca ignorando maiúsculas/minúsculas
+        sql`(${pessoa.nome} || ' ' || ${pessoa.sobrenome}) ilike ${'%' + nome + '%'}`
+      );
   }
   else if (pessoaID){
     if(pessoaID2){ //pesquisa conexão entre dois pontos

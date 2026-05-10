@@ -1,16 +1,19 @@
 <template>
-  <div class="h-screen bg-base-200 flex flex-col overflow-hidden">
+  <div class="h-screen flex flex-col overflow-hidden bg-[#c0c0c0]">
+    <Navbar @open-cities="isModalCityOpen = true" @open-search="isModalSearchOpen = true" />
     
- <Navbar @open-cities="isModalOpen = true" />
     <main class="flex-1 overflow-auto">
       <slot />
     </main>
-    <ModalLocal v-if="isModalOpen" @close="isModalOpen = false" />
+
+    <ModalLocal v-if="isModalCityOpen" @close="isModalCityOpen = false" />
+    <ModalBusca v-if="isModalSearchOpen" @close="isModalSearchOpen = false" />
   </div>
 </template>
 
-<script lang="ts" setup>
-const isModalOpen = ref(false)
+<script setup lang="ts">
+const isModalCityOpen = ref(false)
+const isModalSearchOpen = ref(false)
 </script>
 
 <style>
