@@ -20,10 +20,7 @@
             <input v-model="quickForm.sobrenome" type="text" class="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-r-white border-b-white p-1 text-sm outline-none focus:bg-[#ffffcc]" />
           </div>
           <div class="flex gap-2">
-            <div class="flex-1">
-              <label class="text-[9px] font-bold uppercase block mb-1">Nascimento:</label>
-              <input v-model="quickForm.datanasc" type="date" class="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-r-white border-b-white p-1 text-sm outline-none" />
-            </div>
+           
             <div class="w-24">
               <label class="text-[9px] font-bold uppercase block mb-1">Sexo:</label>
               <select v-model="quickForm.sexo" class="w-full bg-white border-2 border-t-[#808080] border-l-[#808080] border-r-white border-b-white p-1 text-sm outline-none">
@@ -56,7 +53,6 @@ const carregando = ref(false)
 const quickForm = ref({
   nome: '',
   sobrenome: '',
-  datanasc: '',
   sexo: 'M',
   relacoes: [] 
 })
