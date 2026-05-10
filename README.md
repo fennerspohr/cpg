@@ -3,6 +3,7 @@
 - [x] Banco de dados;
 - [x] Página de criação de pessoa;
   - [x] Adicionar relação + criar nova pessoa (só nome, sobrenome e sexo) para adicionar relação;
+  - [ ] Adicionar data e local de casamento;
   - [x] Adicionar local;
 - [x] Visualização em lista de pessoas;
   - [ ] Pesquisar por nome, sobrenome;
