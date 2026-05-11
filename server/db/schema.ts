@@ -23,7 +23,7 @@ export const pessoa = pgTable('pessoa', {
 });
 
 export const tipo_relacao = pgTable('tipo_relacao', {
-    id: serial().primaryKey(),
+    id: integer().primaryKey(),
     descricao: varchar({length: 100}).notNull()
 });
 
