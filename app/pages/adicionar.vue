@@ -107,7 +107,10 @@
       </form>
     </div>
 
-    <ModalLocal v-if="modalLocalAberto" @close="modalLocalAberto = false" />
+    <ModalLocal 
+  v-if="modalLocalAberto" 
+  @close="modalLocalAberto = false; refreshLocais()" 
+/>
     <ModalCadastroRapido v-if="modalRapidoAberto" @close="modalRapidoAberto = false" @saved="pessoaCadastradaComSucesso" />
   </div>
 </template>
@@ -118,6 +121,7 @@ const loading = ref(false)
 const modalLocalAberto = ref(false)
 const modalRapidoAberto = ref(false)
 const indexRelacaoSendoEditada = ref<number | null>(null)
+  
 
 interface PessoaForm {
   [key: string]: any;
@@ -140,7 +144,7 @@ const eventos = [
   { chave: 'morte', label: 'Morte' }
 ]
 
-const { data: locais } = await useFetch<any[]>('/api/local')
+const { data: locais, refresh: refreshLocais } = await useFetch<any[]>('/api/local')
 const { data: tiposRelacao } = await useFetch<any[]>('/api/tipo_relacao')
 const { data: pessoasExistentes, refresh: refreshPessoas } = await useFetch<any[]>('/api/pessoa')
 

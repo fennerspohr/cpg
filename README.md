@@ -7,7 +7,7 @@
   - [ ] Adicionar data e local de casamento;
   - [x] Adicionar local;
 - [x] Visualização em lista de pessoas;
-  - [ ] Pesquisar por nome, sobrenome;
+  - [x] Pesquisar por nome, sobrenome;
 - [ ] Visualizar pessoa;
 - [ ] Visualização em árvore;
 - [ ] Buscar relação entre duas pessoas (função twopoint_search);
