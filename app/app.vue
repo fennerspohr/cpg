@@ -1,10 +1,13 @@
 <template>
   <NuxtLayout>
     <NuxtPage />
+    <!-- <Familytree/> VOU REMOVER DEPOIS DE TERMINAR--> 
   </NuxtLayout>
 </template>
 
 <script setup>
+import Familytree from './pages/familytree.vue';
+
 // Sending a query param
 // import {ref} from 'vue';
 // const pessoa = ref();

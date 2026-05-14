@@ -7,13 +7,13 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM relacao 
                     WHERE p1 = NEW.p2 AND p2 = NEW.p1) THEN
         IF(NEW.rel = 1) THEN
-            current_rel = 4;
+            current_rel = 3;
         ELSIF(NEW.rel = 2) THEN
             current_rel = 2;
         ELSIF(NEW.rel = 3) THEN
             current_rel = 3;
         ELSE
-            current_rel = 1;
+            current_rel = 0;
         END IF;
 
         INSERT INTO relacao (p1, p2, rel, metadata)
