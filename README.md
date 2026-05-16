@@ -9,11 +9,68 @@
 - [x] Visualização em lista de pessoas;
   - [x] Pesquisar por nome, sobrenome;
 - [ ] Visualizar pessoa;
+- [ ] Atualizar dados de pessoa;
 - [ ] Visualização em árvore;
 - [ ] Buscar relação entre duas pessoas (função twopoint_search);
 - [ ] Botão de backup (download de arquivos do postgres);
 - [ ] Relatório;
 - [ ] Manual de uso;
+
+# Rotas
+## Local
+### GET
+- /api/local -> busca todos os locais;
+- /api/local; query: {string}-> busca locais que contenha a string no nome;
+### POST
+- /api/local -> salvar novo local
+  - body: {
+    descricao: string,
+    estado: char[2]
+  }
+## Pessoa
+### GET
+- /api/pessoa -> busca todas as pessoas
+- /api/pessoa; query: {nome: string} -> busca pesssoas que contenham a string no nome ou sobrenome
+- /api/pessoa; query: {id: int} -> busca pessoa com ID específico
+### POST
+- /api/pessoa -> salva nova pessoa
+  - body: {
+    nome: string,
+    sobrenome: string,
+    sexo: char,
+    datanasc: date,
+    localnasc: int,
+    databatismo: date,
+    localbatismo: int,
+    datamorte: date,
+    localmorte: int,
+    obs: text,
+    relacoes: [{
+      p2: int,
+      rel: int,
+      metadata: json
+    }]
+  }
+### PUT
+- /api/pessoa/{id} -> atualiza registro de pessoa com id correspondente
+  - body: {
+    nome: string,
+    sobrenome: string,
+    sexo: char,
+    datanasc: date,
+    localnasc: int,
+    databatismo: date,
+    localbatismo: int,
+    datamorte: date,
+    localmorte: int,
+    obs: text,
+    relacoes: [{
+      p2: int,
+      rel: int,
+      metadata: json
+    }]
+  }
+
 
 # Nuxt Minimal Starter
 
