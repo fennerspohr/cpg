@@ -24,12 +24,13 @@ export default {
         .setOrientationVertical()
     
       const f3Card = f3Chart.setCardHtml()
-        .setCardDisplay([["first name","last name"], ["birth year","birth place"],["death year","death place"]])
+        .setCardDisplay([["first name","last name"], ["birth year"],["death year"]])
         .setCardDim({"width":260})
         .setMiniTree(true)
         .setStyle('rect')
         .setOnHoverPathToMain()
         .setOnCardClick(() => {})
+        // .setMiniTree()
       f3Chart.updateMainId(main)
 
       f3Chart.updateTree({initial: true})

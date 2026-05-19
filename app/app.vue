@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout>
-    <NuxtPage />
-    <!-- <Familytree :data="arvore" main="24"/> -->
+    <!-- <NuxtPage /> -->
+    <Familytree :data="arvore" main="26"/>
   </NuxtLayout>
 </template>
 
@@ -23,7 +23,7 @@ const arvore = ref();
 
 
 arvore.value = await $fetch('/api/arvore/',{
-    query: { id: 24}
+    query: { id: 26}
   })
   // console.log(arvore.value)
 

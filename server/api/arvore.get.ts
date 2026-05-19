@@ -41,17 +41,16 @@ export default defineEventHandler(async (event) => {
             }
 
             for(const [idx, value] of p2.entries()){
-                if(value == pessoas[p].id && relacoes[idx] == 1){
+                if(value == pessoas[p].id && relacoes[idx] == 1 && !children.includes(`"${p1[idx]}"`)){
                     children.push(`"${p1[idx]}"`);
                 }
-                else if(value == pessoas[p].id && relacoes[idx] == 2){
+                else if(value == pessoas[p].id && relacoes[idx] == 2 && !spouses.includes(`"${p1[idx]}"`)){
                     spouses.push(`"${p1[idx]}"`);
                 }
-                else if(value == pessoas[p].id && relacoes[idx] == 3){
+                else if(value == pessoas[p].id && relacoes[idx] == 3 && !parents.includes(`"${p1[idx]}"`)){
                     parents.push(`"${p1[idx]}"`);
                 }
             }
-
             data.push(JSON.parse(`{"id": "${pessoas[p].id}",
                 "rels": {"parents": [${parents.join(',')}],"spouses":[${spouses.join(',')}],"children":[${children.join(',')}]},
                 "data":{
@@ -59,10 +58,17 @@ export default defineEventHandler(async (event) => {
                     "first name": "${pessoas[p]['first name']}",
                     "last name": "${pessoas[p]['last name']}",
                     "birth year": "${pessoas[p]['birth year'] == null? " ": pessoas[p]['birth year']}",
-                    "birth place": "${pessoas[p]['birth place'] ==  undefined? " ": pessoas[p]['birth place']}",
-                    "death year": "${pessoas[p]['death year'] == null? " ": pessoas[p]['death year']}",
-                    "death place": "${pessoas[p]['death place']  ==  undefined? " ": pessoas[p]['death place']}"}}`))
-        }
+                    "death year": "${pessoas[p]['death year'] == null? " ": pessoas[p]['death year']}"}}`))
+            console.log(`{"id": "${pessoas[p].id}",
+                "rels": {"parents": [${parents.join(',')}],"spouses":[${spouses.join(',')}],"children":[${children.join(',')}]},
+                "data":{
+                    "gender": "${pessoas[p]['gender']}",
+                    "first name": "${pessoas[p]['first name']}",
+                    "last name": "${pessoas[p]['last name']}",
+                    "birth year": "${pessoas[p]['birth year'] == null? " ": pessoas[p]['birth year']}",
+                    "death year": "${pessoas[p]['death year'] == null? " ": pessoas[p]['death year']}"}}`)
+        
+                }
 
         return ( data)
     }
