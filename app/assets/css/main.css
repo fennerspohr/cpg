@@ -30,3 +30,37 @@
 
 :root {
   display: block};
+
+#FamilyChart {
+  background: white !important;
+}
+
+/* fundo dos cards */
+#FamilyChart .card-body,
+#FamilyChart .card-female,
+#FamilyChart .card-male,
+#FamilyChart .card-main {
+  fill: white !important;
+  stroke: black !important;
+}
+
+/* textos */
+#FamilyChart text,
+#FamilyChart .card-text,
+#FamilyChart tspan {
+  fill: black !important;
+  color: black !important;
+}
+
+/* linhas de conexão */
+#FamilyChart path,
+#FamilyChart line,
+#FamilyChart .link {
+  stroke: black !important;
+}
+
+/* mini tree */
+#FamilyChart .mini-tree line,
+#FamilyChart .mini-tree path {
+  stroke: black !important;
+}

@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout>
     <NuxtPage />
-    <!-- <Familytree/> VOU REMOVER DEPOIS DE TERMINAR--> 
+    <!-- <Familytree :data="arvore" main="24"/> -->
   </NuxtLayout>
 </template>
 
@@ -12,7 +12,7 @@ import Familytree from './pages/familytree.vue';
 // import {ref} from 'vue';
 // const pessoa = ref();
 // const response = ref();
-// const arvore = ref();
+const arvore = ref();
 
 // async function getPessoa(){
 //   pessoa.value = await $fetch('/api/pessoa/', {
@@ -21,12 +21,12 @@ import Familytree from './pages/familytree.vue';
 // console.log(pessoa.value)
 // }
 
-// async function getArvore(){
-//   arvore.value = await $fetch('/api/pessoa/',{
-//     query: { id: 1, tipo:'tree'}
-//   })
-//   console.log(arvore.value)
-// }
+
+arvore.value = await $fetch('/api/arvore/',{
+    query: { id: 24}
+  })
+  // console.log(arvore.value)
+
 
 // async function postLocal(){
 //   response.value = await $fetch('/api/local', {
