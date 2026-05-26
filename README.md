@@ -4,11 +4,11 @@
 - [x] Banco de dados;
 - [x] Página de criação de pessoa;
   - [x] Adicionar relação + criar nova pessoa (só nome, sobrenome e sexo) para adicionar relação;
-  - [ ] Adicionar data e local de casamento;
+  - [x] Adicionar data e local de casamento;
   - [x] Adicionar local;
 - [x] Visualização em lista de pessoas;
   - [x] Pesquisar por nome, sobrenome;
-- [ ] Visualizar pessoa;
+- [x] Visualizar pessoa;
 - [ ] Atualizar dados de pessoa;
 - [ ] Visualização em árvore;
 - [ ] Buscar relação entre duas pessoas (função twopoint_search);

@@ -102,18 +102,20 @@ const menuItems: MenuItem[] = [
     icon: "lucide:map-pin", 
     iconClass: "text-yellow-700" 
   },
-  { 
-    label: "Logs", 
-    icon: "lucide:history", 
+
+  { divider: true },
+  
+    { 
+    label: "Detalhes", 
+    icon: "lucide:clipboard-list", 
     iconClass: "text-orange-900",
     to: "/logs" 
   },
-  { divider: true },
   { 
-    label: "Ajuda", 
-    icon: "lucide:help-circle", 
+    label: "Arvore", 
+    icon: "lucide:folder-tree", 
     iconClass: "text-blue-600",
-    to: "/ajuda"
+    to: "/arvore"
   },
 ];
 </script>

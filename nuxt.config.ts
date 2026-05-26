@@ -1,23 +1,21 @@
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  compatibilityDate: "2025-05-01", 
+
   devtools: { enabled: true },
 
   runtimeConfig: {
-    // As variáveis aqui ficam disponíveis apenas no servidor
-    databaseUrl: process.env.DATABASE_URL 
+    databaseUrl: process.env.DATABASE_URL
   },
 
-  // 1. REGISTRE OS MÓDULOS AQUI PRIMEIRO
   modules: [
-    '@nuxthub/core',
+    // REMOVIDO: '@nuxthub/core'  ← era esse o culpado
     '@nuxt/icon'
   ],
 
   css: ['~/assets/css/main.css'],
 
-  // 2. AGORA O TS VAI RECONHECER O 'icon' AQUI EMBAIXO
   icon: {
     serverBundle: 'local',
   },

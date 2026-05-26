@@ -1,27 +1,42 @@
 import { db } from '../utils/drizzle';
-import { pessoa } from "../db/schema"
-import { desc, eq, sql } from 'drizzle-orm';
-
+import { pessoa } from "../db/schema";
+import { desc, sql } from 'drizzle-orm';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  const nome = query.nome;
+  const busca = query.nome as string;
   const pessoaID = query.id;
+  const pessoaID2 = query.id2;
 
-  
-  if(nome){ //pesquisa por nome
+  if (busca) {
+    if (/^\d+$/.test(busca)) {
+      return await db.select()
+        .from(pessoa)
+        .where(sql`${pessoa.id} = ${parseInt(busca)}`);
+    }
+
     return await db.select()
       .from(pessoa)
-     .where(
-        // ilike para busca ignorando maiúsculas/minúsculas
-        sql`(${pessoa.nome} || ' ' || ${pessoa.sobrenome}) ilike ${'%' + nome + '%'}`
-      );
-  }
-  else if (pessoaID){ //busca pessoa por id específico
-    return await db.select()
-    .from(pessoa)
-    .where(eq(pessoa.id, Number(pessoaID)));
+      .where(
+        sql`(${pessoa.nome} || ' ' || ${pessoa.sobrenome}) ilike ${'%' + busca + '%'}`
+      )
+      .orderBy(desc(pessoa.id));
   }
 
-  return await db.select().from(pessoa).orderBy(desc(pessoa.id)); //retorna todos
+  else if (pessoaID) {
+    if (pessoaID2) {
+      const response = await db.execute(
+        sql`SELECT * FROM twopoint_search(${pessoaID}::int, ${pessoaID2}::int)`
+      );
+      return response.rows;
+    } else {
+      const response = await db.execute(
+        sql`SELECT * FROM tree_search(${pessoaID}::int)`
+      );
+      return response.rows;
+    }
+  }
+
+  // 3. Retorno padrão
+  return await db.select().from(pessoa).orderBy(desc(pessoa.id));
 });
