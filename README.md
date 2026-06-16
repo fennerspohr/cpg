@@ -1,4 +1,10 @@
 ![alt text](image-1.png)
+# ELECTRON
+- comando para gerar o .exe no windows: npm run electron:build:win
+- IMPORTANTE: é preciso copiar o .env com as informações do banco de dados pra dentro da pasta onde o executável está. Exemplo:
+- dist-electron/win-unpacked/
+├── CPG.exe
+└── .env    ← here
 # To do
 
 - [x] Banco de dados;
