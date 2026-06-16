@@ -1,0 +1,40 @@
+appId: com.cpg.app
+productName: CPG
+copyright: Copyright © 2025
+
+directories:
+  output: dist-electron
+
+# What gets included in the package
+files:
+  - electron/**/*
+  - .output/**/*
+  - .env
+  - node_modules/**/*
+  - package.json
+
+# The .output folder from nuxt build must be included
+extraResources:
+  - from: .output
+    to: app/.output
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: public/favicon.ico   # swap for your icon if you have one
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  installerLanguages:
+    - pt_BR
+  language: 1046              # Portuguese (Brazil)
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+# Nuxt server runs as a Node child process, not a packaged binary
+# so we need Node available — electron ships its own Node, we use that

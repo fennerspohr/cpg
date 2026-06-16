@@ -2,12 +2,18 @@
   "name": "cpg",
   "type": "module",
   "private": true,
+  "main": "electron/main.cjs",
+  "version": "1.0.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "electron:dev": "nuxt build && electron .",
+"electron:build:win": "nuxt build && electron-builder build --win",
+"electron:build:linux": "nuxt build && electron-builder build --linux"
+
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.4.5",
@@ -29,6 +35,8 @@
     "@types/pg": "^8.20.0",
     "autoprefixer": "^10.5.0",
     "daisyui": "^5.5.19",
+    "electron": "^41.7.1",
+    "electron-builder": "^26.15.3",
     "postcss": "^8.5.14",
     "tailwindcss": "^4.3.0"
   }
