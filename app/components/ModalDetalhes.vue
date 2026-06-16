@@ -15,7 +15,7 @@
       @ver-arvore="abrirArvore"
     />
 
-    <!-- Janela de árvore -->
+    <!-- Janelas de árvore -->
     <JanelaArvore
       v-for="(a, idx) in pilhaArvores"
       :key="'arvore-' + a.id"
@@ -24,6 +24,15 @@
       :z-index="80 + idx"
       :offset="idx"
       @fechar="fecharArvore(idx)"
+      @abrir-pessoa="abrirPessoaPorId"
+    />
+
+    <!-- Janela de busca de relação (única) -->
+    <JanelaBuscaRelacao
+      v-if="buscaRelacaoAberta"
+      :z-index="120"
+      @fechar="buscaRelacaoAberta = false"
+      @abrir-pessoa="abrirPessoa"
     />
 
   </div>
@@ -53,8 +62,9 @@ const emit = defineEmits<{
   editar: [id: number]
 }>()
 
-const pilhaJanelas = ref<Pessoa[]>([props.pessoa])
-const pilhaArvores = ref<ArvoreItem[]>([])
+const pilhaJanelas       = ref<Pessoa[]>([props.pessoa])
+const pilhaArvores       = ref<ArvoreItem[]>([])
+const buscaRelacaoAberta = ref(false)
 
 function abrirPessoa(p: Pessoa) {
   if (!pilhaJanelas.value.find(j => j.id === p.id)) {
@@ -62,9 +72,15 @@ function abrirPessoa(p: Pessoa) {
   }
 }
 
+async function abrirPessoaPorId(id: number) {
+  const lista = await $fetch<Pessoa[]>('/api/pessoa', { query: { nome: String(id) } })
+  const pessoa = lista?.find((p: any) => p.id === id)
+  if (pessoa) abrirPessoa(pessoa)
+}
+
 function fecharJanela(idx: number) {
   pilhaJanelas.value.splice(idx, 1)
-  if (pilhaJanelas.value.length === 0 && pilhaArvores.value.length === 0) {
+  if (pilhaJanelas.value.length === 0 && pilhaArvores.value.length === 0 && !buscaRelacaoAberta.value) {
     emit('fechar')
   }
 }
@@ -80,8 +96,11 @@ function abrirArvore(id: number) {
 
 function fecharArvore(idx: number) {
   pilhaArvores.value.splice(idx, 1)
-  if (pilhaJanelas.value.length === 0 && pilhaArvores.value.length === 0) {
+  if (pilhaJanelas.value.length === 0 && pilhaArvores.value.length === 0 && !buscaRelacaoAberta.value) {
     emit('fechar')
   }
 }
+
+// Expõe para o pai poder abrir a busca de relação
+defineExpose({ abrirBuscaRelacao: () => { buscaRelacaoAberta.value = true } })
 </script>

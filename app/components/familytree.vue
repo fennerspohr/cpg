@@ -9,20 +9,22 @@ import 'family-chart/styles/family-chart.css';
      
 export default {
   name: "FamilyChart",
-  props: { data: Array, main: String },
+  props: { 
+    data: Array, 
+    main: String,
+    onCardClick: { type: Function, default: null }  // ← novo
+  },
 
   data() {
-    // ID único por instância — evita colisão quando múltiplas árvores abertas
     return {
       chartId: `FamilyChart-${Math.random().toString(36).slice(2, 9)}`
     }
   },
 
   mounted() {
-    const { data, main, chartId } = this
-    create(data, main, chartId)
+    const { data, main, chartId, onCardClick } = this
     
-    function create(data, main, chartId) {
+    function create(data, main, chartId, onCardClick) {
       const f3Chart = f3.createChart('#' + chartId, data)
         .setTransitionTime(1000)
         .setCardXSpacing(320)
@@ -37,11 +39,18 @@ export default {
         .setMiniTree(true)
         .setStyle('rect')
         .setOnHoverPathToMain()
-        .setOnCardClick(() => {})
+        .setOnCardClick((e, d) => {
+          // d.data.id é o ID da pessoa clicada
+          if (onCardClick && d?.data?.id) {
+            onCardClick(Number(d.data.id))
+          }
+        })
 
       f3Chart.updateMainId(main)
       f3Chart.updateTree({ initial: true })
     }
+    
+    create(data, main, chartId, onCardClick)
   }
 };
 </script>

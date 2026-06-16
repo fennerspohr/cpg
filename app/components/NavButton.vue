@@ -31,9 +31,9 @@ defineProps<{
 @reference "../assets/css/main.css";
 
 .nav-btn {
-  @apply flex flex-col items-center justify-center w-16 h-14 bg-base-100
+  @apply flex flex-col items-center justify-center w-24 h-16 bg-base-100
          border-2 border-t-white border-l-white border-r-base-300 border-b-base-300
-         hover:bg-base-200 active:border-t-base-300 active:border-l-base-300 
+         hover:bg-base-200 active:border-t-base-300 active:border-l-base-300
          active:border-r-white active:border-b-white;
 }
 
@@ -42,6 +42,6 @@ defineProps<{
 }
 
 .label-style {
-  @apply text-[10px] mt-1 font-bold uppercase tracking-tighter;
+  @apply text-[9px] mt-1 font-bold uppercase tracking-tight text-center leading-tight;
 }
 </style>

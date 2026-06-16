@@ -1,19 +1,20 @@
-// server/api/users/[id].put.ts
 import { db } from '../utils/drizzle';
 import { pessoa, relacao } from "../db/schema"
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const id = getRouterParam(event, 'id')
+  const id = body.id ?? getRouterParam(event, 'id')
 
   try {
+    const { id: _id, relacoes, ...camposPessoa } = body
+
     const updatedUser = await db.update(pessoa)
-      .set(body)
+      .set(camposPessoa)
       .where(eq(pessoa.id, Number(id)))
-      .returning() // Optional: returns the updated record (Postgres/SQLite)
-    
-      await updateRelations(Number(id), body.relacoes);
+      .returning()
+
+    await updateRelations(Number(id), relacoes ?? [])
 
     return { success: true, data: updatedUser[0] }
   } catch (error: any) {
@@ -24,36 +25,29 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-interface relacoes {id: number; p1: number; p2:number; rel:number; metadata:JSON}
+interface Relacao { id?: number; p1?: number; p2: number; rel: number; metadata: any }
 
-async function updateRelations(id: number, curRel:relacoes[]){
-  const previousRelations = await db.select().from(relacao).where(eq(relacao.p1, id));
+async function updateRelations(id: number, currentRelations: Relacao[]) {
+  const previousRelations = await db.select().from(relacao).where(eq(relacao.p1, id))
 
-  var currentRelations = curRel;
-
-  for(const r of currentRelations){
-    // verifica se relação existente na pessoa atualizada já existia
-    const foundUser = previousRelations.find(rel => rel.id == r.id);
-
-    //se sim
-    if(foundUser){
-      // remove essa relação da lista de relações prévias
-      previousRelations.splice(previousRelations.findIndex(rel => rel.id = foundUser.id))
-    }
-    else{
-      // cria as novas relações no banco
+  for (const r of currentRelations) {
+    const foundIdx = previousRelations.findIndex(rel => rel.id === r.id)
+    if (foundIdx !== -1) {
+      // relação já existia — remove da lista de "a deletar"
+      previousRelations.splice(foundIdx, 1)
+    } else {
+      // nova relação — cria no banco
       await db.insert(relacao).values({
-        p1:id,
-        p2:r.p2,
-        rel:r.rel,
-        metadata:r.metadata
-      });
+        p1: id,
+        p2: r.p2,
+        rel: r.rel,
+        metadata: r.metadata
+      })
     }
   }
 
-  // percorre a lista de relações prévias que não estão presentes na pessoa atualizada
-  for(const r of previousRelations){
-    // deleta essas relações do banco
-    await db.delete(relacao).where(eq(relacao.id, r.id)); 
+  // relações que não vieram no payload — deletar
+  for (const r of previousRelations) {
+    await db.delete(relacao).where(eq(relacao.id, r.id))
   }
 }

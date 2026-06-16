@@ -1,231 +1,285 @@
 <template>
   <div
     ref="janela"
-    class="absolute pointer-events-auto bg-[#d4d0c8] border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] shadow-[2px_2px_0_#000] flex flex-col font-sans select-none"
-    :style="{
-      left: pos.x + 'px',
-      top:  pos.y + 'px',
-      width: '740px',
-      height: '82vh',
-      zIndex: zIndex,
-    }"
-    @mousedown="trazerParaFrente"
+    class="absolute pointer-events-auto bg-base-100 border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] shadow-[2px_2px_0_#000] flex flex-col font-sans select-none"
+    :style="{ left: pos.x + 'px', top: pos.y + 'px', width: '720px', height: '80vh', zIndex }"
+    @mousedown="emit('trazerParaFrente', pessoa.id)"
   >
 
-    <!-- titulo da janela -->
+    <!-- Barra de título — azul quando ativa, cinza quando em segundo plano -->
     <div
-      class="flex-none flex items-center justify-between bg-primary px-2 py-1 mx-0.5 mt-0.5 cursor-move"
+      class="flex-none flex items-center justify-between px-2 py-1 mx-0.5 mt-0.5 cursor-move"
+      :class="ativa ? 'bg-[#000080]' : 'bg-[#7f7f7f]'"
       @mousedown.prevent="iniciarDrag"
     >
-      <span class="text-white text-sm font-bold uppercase tracking-wider flex items-center gap-2 pointer-events-none">
-        <Icon name="lucide:user" class="text-sm" />
+      <span class="text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 pointer-events-none">
+        <Icon name="lucide:user" class="text-xs" />
         {{ pessoa.sobrenome }}, {{ pessoa.nome }}
-        <span class="text-xs font-normal opacity-75">(ID {{ String(pessoa.id).padStart(3,'0') }})</span>
+        <span class="text-[10px] font-normal opacity-70">#{{ String(pessoa.id).padStart(3, '0') }}</span>
       </span>
-      <button @click.stop="$emit('fechar')"
-        class="bg-[#d4d0c8] border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] w-6 h-6 flex items-center justify-center text-sm font-bold hover:brightness-110 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white cursor-pointer"
+      <button @click.stop="emit('fechar')"
+        class="bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 w-5 h-5 flex items-center justify-center text-xs font-bold hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white cursor-pointer"
         style="pointer-events: all">
         ×
       </button>
     </div>
 
-    <!-- abas -->
-    <div class="flex-none flex items-end gap-0.5 px-2 pt-1.5 bg-[#d4d0c8] border-b-2 border-[#808080]">
+    <!-- Abas -->
+    <div class="flex-none flex items-end gap-0.5 px-2 pt-1 bg-base-100 border-b-2 border-base-300">
       <button
         v-for="aba in abas" :key="aba.id"
         @click="abaAtiva = aba.id"
-        class="px-4 py-1 text-xs font-bold uppercase tracking-wide border-2 relative"
+        class="px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide border-2 relative flex items-center gap-1"
         :class="abaAtiva === aba.id
-          ? 'bg-[#d4d0c8] border-t-white border-l-white border-r-[#808080] border-b-[#d4d0c8] -mb-[2px] z-10'
-          : 'bg-[#b8b4ac] border-t-[#808080] border-l-[#808080] border-r-white border-b-[#808080] text-[#404040] hover:brightness-105'"
+          ? 'bg-base-100 border-t-white border-l-white border-r-base-300 border-b-base-100 -mb-0.5 z-10'
+          : 'bg-[#b8b4ac] border-t-base-300 border-l-base-300 border-r-white border-b-base-300 text-[#505050] hover:brightness-105'"
       >
-        <Icon :name="aba.icon" class="text-xs mr-1" />
+        <Icon :name="aba.icon" class="text-[10px]" />
         {{ aba.label }}
       </button>
     </div>
 
-    <!-- aba atual -->
-    <div class="flex-1 overflow-y-auto">
+    <!-- Conteúdo das abas -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden">
 
-      <!-- aba pessoa -->
+      <!-- ─── Aba Pessoa ─── -->
       <div v-show="abaAtiva === 'pessoa'" class="p-4 flex flex-col gap-4">
 
-        <div class="border-b-2 border-[#808080] pb-3">
-          <p class="text-xs font-bold uppercase text-black tracking-widest mb-2">Identificação</p>
-          <div class="grid grid-cols-7 gap-x-6">
-            <div class="col-span-3">
-              <p class="text-xs font-bold uppercase text-[#404040] mb-0.5">Nome</p>
-              <p class="text-xl font-bold uppercase">{{ pessoa.nome }}</p>
-            </div>
-            <div class="col-span-3">
-              <p class="text-xs font-bold uppercase text-[#404040] mb-0.5">Sobrenome</p>
-              <p class="text-xl font-bold uppercase">{{ pessoa.sobrenome }}</p>
-            </div>
-            <div class="col-span-1">
-              <p class="text-xs font-bold uppercase text-[#404040] mb-0.5">Sexo</p>
-              <p class="text-xl font-bold">{{ pessoa.sexo === 'M' ? 'Masc.' : pessoa.sexo === 'F' ? 'Fem.' : '—' }}</p>
+        <!-- Identificação -->
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[9px] font-bold uppercase text-[#404040] tracking-widest whitespace-nowrap">Identificação</span>
+            <div class="flex-1 h-px bg-[#888888]" />
+          </div>
+          <div class="flex border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-white overflow-hidden">
+            <div class="w-1.5 flex-none"
+              :class="pessoa.sexo === 'M' ? 'bg-blue-400' : pessoa.sexo === 'F' ? 'bg-pink-400' : 'bg-[#b0b0b0]'" />
+            <div class="flex-1 grid grid-cols-5 gap-x-4 px-4 py-3 items-center">
+              <div class="col-span-2">
+                <p class="text-[8px] font-bold uppercase text-[#606060] mb-0.5">Nome</p>
+                <p class="text-base font-bold leading-tight">{{ pessoa.nome }}</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-[8px] font-bold uppercase text-[#606060] mb-0.5">Sobrenome</p>
+                <p class="text-base font-bold uppercase leading-tight">{{ pessoa.sobrenome }}</p>
+              </div>
+              <div>
+                <p class="text-[8px] font-bold uppercase text-[#606060] mb-0.5">Sexo</p>
+                <p class="text-sm font-bold"
+                  :class="pessoa.sexo === 'M' ? 'text-blue-700' : pessoa.sexo === 'F' ? 'text-pink-700' : 'text-[#909090]'">
+                  {{ pessoa.sexo === 'M' ? 'Masc.' : pessoa.sexo === 'F' ? 'Fem.' : '—' }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="border-b-2 border-[#808080] pb-3">
-          <p class="text-xs font-bold uppercase text-black tracking-widest mb-2">Eventos Vitais</p>
-          <div class="grid grid-cols-3 gap-x-6">
-            <div v-for="ev in eventosVitais" :key="ev.label">
-              <p class="text-xs font-bold uppercase text-[#404040] mb-0.5">{{ ev.label }}</p>
-              <p class="text-base font-bold">{{ ev.data ?? '—' }}</p>
-              <p class="text-sm text-[#303030]">{{ ev.local ?? '—' }}</p>
+        <!-- Eventos Vitais -->
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[9px] font-bold uppercase text-[#404040] tracking-widest whitespace-nowrap">Eventos Vitais</span>
+            <div class="flex-1 h-px bg-[#888888]" />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div v-for="ev in eventosVitais" :key="ev.label"
+              class="border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-white px-3 py-2">
+              <p class="text-[8px] font-bold uppercase text-[#606060] mb-1">{{ ev.label }}</p>
+              <p class="text-sm font-bold text-black leading-tight">{{ ev.data ?? '—' }}</p>
+              <p class="text-[10px] text-[#606060] mt-0.5 truncate">{{ ev.local ?? '—' }}</p>
             </div>
           </div>
         </div>
 
-        <div v-if="carregando" class="text-sm text-[#404040] animate-pulse uppercase tracking-widest py-2">
+        <!-- Carregando -->
+        <p v-if="carregando" class="text-[10px] text-[#707070] animate-pulse uppercase tracking-widest py-1">
           Carregando vínculos...
-        </div>
+        </p>
 
         <template v-else-if="detalhes">
-          <!-- pais -->
-          <div class="border-b-2 border-[#808080] pb-3">
-            <p class="text-xs font-bold uppercase text-black tracking-widest mb-2">Filiação</p>
-            <div class="grid grid-cols-2 gap-3">
-              <div v-for="(label, idx) in ['Pai', 'Mãe']" :key="label">
-                <p class="text-xs font-bold uppercase text-[#404040] mb-1">{{ label }}</p>
-                <button v-if="detalhes.familia.pais[idx]"
-                  type="button" @click="$emit('abrirPessoa', detalhes.familia.pais[idx].pessoa)"
-                  class="w-full text-left border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] px-3 py-2 hover:brightness-95 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white"
-                  :style="{ backgroundColor: detalhes.familia.pais[idx].pessoa?.sexo === 'M' ? 'var(--color-male,#c8dce8)' : 'var(--color-female,#e8c8d8)' }">
-                  <p class="text-sm font-bold uppercase">{{ detalhes.familia.pais[idx].pessoa?.sobrenome }}, {{ detalhes.familia.pais[idx].pessoa?.nome }}</p>
-                  <p class="text-xs text-[#303030] mt-0.5">b.: {{ detalhes.familia.pais[idx].pessoa?.datanasc?.substring(0,4) ?? '—' }}</p>
+
+          <!-- Filiação -->
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-[9px] font-bold uppercase text-[#404040] tracking-widest whitespace-nowrap">Filiação</span>
+              <div class="flex-1 h-px bg-[#888888]" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div v-for="(label, i) in ['Pai', 'Mãe']" :key="label">
+                <p class="text-[9px] font-bold uppercase text-[#404040] mb-1">{{ label }}</p>
+                <button v-if="detalhes.familia.pais[i]"
+                  type="button"
+                  @click="emit('abrirPessoa', detalhes.familia.pais[i].pessoa)"
+                  class="w-full text-left border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-2 hover:brightness-95 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center justify-between gap-2"
+                  :style="corCard(detalhes.familia.pais[i].pessoa?.sexo)">
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold uppercase truncate leading-tight">{{ detalhes.familia.pais[i].pessoa?.sobrenome }}, {{ detalhes.familia.pais[i].pessoa?.nome }}</p>
+                    <p class="text-[9px] font-mono text-[#606060] mt-0.5">{{ anoVida(detalhes.familia.pais[i].pessoa?.datanasc, detalhes.familia.pais[i].pessoa?.datamorte) }}</p>
+                  </div>
+                  <Icon name="lucide:chevron-right" class="text-[#909090] text-xs flex-none" />
                 </button>
-                <div v-else class="px-3 py-2 text-sm text-[#808080] italic">Não informado</div>
+                <p v-else class="text-xs text-[#909090] italic px-1 py-2">—</p>
               </div>
             </div>
           </div>
 
-          <!-- conjugues -->
-          <div v-if="detalhes.familia.conjuges.length" class="border-b-2 border-[#808080] pb-3">
-            <p class="text-xs font-bold uppercase text-black tracking-widest mb-2">
-              {{ detalhes.familia.conjuges.length > 1 ? 'Cônjuges' : 'Cônjuge' }}
-            </p>
+          <!-- Cônjuge(s) -->
+          <div v-if="detalhes.familia.conjuges.length">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-[9px] font-bold uppercase text-[#404040] tracking-widest whitespace-nowrap">
+                {{ detalhes.familia.conjuges.length > 1 ? 'Cônjuges' : 'Cônjuge' }}
+              </span>
+              <div class="flex-1 h-px bg-[#888888]" />
+            </div>
             <div class="flex flex-col gap-2">
-              <div v-for="v in detalhes.familia.conjuges" :key="v.relId" class="flex flex-col gap-1.5">
-                <button type="button" @click="$emit('abrirPessoa', v.pessoa)"
-                  class="w-full text-left border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] px-3 py-2 hover:brightness-95 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white"
-                  :style="{ backgroundColor: v.pessoa?.sexo === 'M' ? 'var(--color-male,#c8dce8)' : 'var(--color-female,#e8c8d8)' }">
-                  <p class="text-sm font-bold uppercase">{{ v.pessoa?.sobrenome }}, {{ v.pessoa?.nome }}</p>
-                  <p class="text-xs text-[#303030] mt-0.5">b.: {{ v.pessoa?.datanasc?.substring(0,4) ?? '—' }}</p>
+              <div v-for="v in detalhes.familia.conjuges" :key="v.relId">
+                <button type="button"
+                  @click="emit('abrirPessoa', v.pessoa)"
+                  class="w-full text-left border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-2 hover:brightness-95 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center justify-between gap-2"
+                  :style="corCard(v.pessoa?.sexo)">
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold uppercase truncate leading-tight">{{ v.pessoa?.sobrenome }}, {{ v.pessoa?.nome }}</p>
+                    <p class="text-[9px] font-mono text-[#606060] mt-0.5">{{ anoVida(v.pessoa?.datanasc, v.pessoa?.datamorte) }}</p>
+                  </div>
+                  <Icon name="lucide:chevron-right" class="text-[#909090] text-xs flex-none" />
                 </button>
-                <div v-if="v.metadata" class="grid grid-cols-2 gap-3 pl-1">
-                  <div>
-                    <p class="text-xs font-bold uppercase text-[#404040] mb-0.5">Data do Casamento</p>
-                    <p class="text-sm">{{ formatarData(v.metadata.data_casamento) ?? '—' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-xs font-bold uppercase text-[#404040] mb-0.5">Local do Casamento</p>
-                    <p class="text-sm">{{ v.metadata.local_casamento ?? '—' }}</p>
-                  </div>
+                <div v-if="v.metadata?.data_casamento || v.metadata?.local_casamento"
+                  class="px-1 py-1 flex gap-6 text-[10px] text-[#404040]">
+                  <span v-if="v.metadata.data_casamento">
+                    <span class="font-bold">Data de casamento:</span> {{ formatarData(v.metadata.data_casamento) }}
+                  </span>
+                  <span v-if="v.metadata.local_casamento">
+                    <span class="font-bold">Cidade de casamento:</span> {{ resolverLocal(Number(v.metadata.local_casamento)) }}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- filhos -->
-          <div v-if="detalhes.familia.filhos.length" class="border-b-2 border-[#808080] pb-3">
-            <p class="text-xs font-bold uppercase text-black tracking-widest mb-2">Filhos ({{ detalhes.familia.filhos.length }})</p>
+          <!-- Filhos -->
+          <div v-if="detalhes.familia.filhos.length">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-[9px] font-bold uppercase text-[#404040] tracking-widest whitespace-nowrap">Filhos ({{ detalhes.familia.filhos.length }})</span>
+              <div class="flex-1 h-px bg-[#888888]" />
+            </div>
             <div class="grid grid-cols-2 gap-2">
               <button v-for="v in detalhes.familia.filhos" :key="v.relId"
-                type="button" @click="$emit('abrirPessoa', v.pessoa)"
-                class="text-left border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] px-3 py-2 hover:brightness-95 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white"
-                :style="{ backgroundColor: v.pessoa?.sexo === 'M' ? 'var(--color-male,#c8dce8)' : 'var(--color-female,#e8c8d8)' }">
-                <p class="text-sm font-bold uppercase truncate">{{ v.pessoa?.sobrenome }}, {{ v.pessoa?.nome }}</p>
-                <p class="text-xs text-[#303030] mt-0.5">b.: {{ v.pessoa?.datanasc?.substring(0,4) ?? '—' }}</p>
+                type="button"
+                @click="emit('abrirPessoa', v.pessoa)"
+                class="text-left border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-2 hover:brightness-95 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center justify-between gap-2"
+                :style="corCard(v.pessoa?.sexo)">
+                <div class="min-w-0">
+                  <p class="text-xs font-bold uppercase truncate leading-tight">{{ v.pessoa?.sobrenome }}, {{ v.pessoa?.nome }}</p>
+                  <p class="text-[9px] font-mono text-[#606060] mt-0.5">{{ anoVida(v.pessoa?.datanasc, v.pessoa?.datamorte) }}</p>
+                </div>
+                <Icon name="lucide:chevron-right" class="text-[#909090] text-xs flex-none" />
               </button>
             </div>
           </div>
 
-          <!-- obs -->
-          <div v-if="pessoa.obs" class="border-b-2 border-[#808080] pb-3">
-            <p class="text-xs font-bold uppercase text-black tracking-widest mb-2">Observações</p>
-            <p class="text-sm text-[#202020] whitespace-pre-wrap leading-relaxed">{{ pessoa.obs }}</p>
+          <!-- Observações -->
+          <div v-if="pessoa.obs">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-[9px] font-bold uppercase text-[#404040] tracking-widest whitespace-nowrap">Observações</span>
+              <div class="flex-1 h-px bg-[#888888]" />
+            </div>
+            <div class="border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-white px-3 py-2">
+              <p class="text-xs text-[#202020] whitespace-pre-wrap leading-relaxed">{{ pessoa.obs }}</p>
+            </div>
           </div>
 
         </template>
       </div>
 
-      <!-- aba lista de parentes -->
+      <!-- ─── Aba Parentes ─── -->
       <div v-show="abaAtiva === 'parentes'" class="flex flex-col h-full">
-        <div v-if="carregando" class="p-4 text-sm text-[#404040] animate-pulse uppercase tracking-widest">
+        <p v-if="carregando" class="p-4 text-[10px] text-[#707070] animate-pulse uppercase tracking-widest">
           Carregando...
-        </div>
+        </p>
         <template v-else-if="detalhes">
-         
-          <div class="flex-none grid gap-0 border-b-2 border-[#808080] bg-[#b8b4ac]"
-            style="grid-template-columns: 2fr 2fr 1fr 1fr 1fr">
-            <div class="px-3 py-1.5 text-[10px] font-bold uppercase border-r border-[#808080]">Nome</div>
-            <div class="px-3 py-1.5 text-[10px] font-bold uppercase border-r border-[#808080]">Relação</div>
-            <div class="px-3 py-1.5 text-[10px] font-bold uppercase border-r border-[#808080] text-center">Sexo</div>
-            <div class="px-3 py-1.5 text-[10px] font-bold uppercase border-r border-[#808080] text-center">Nasc.</div>
-            <div class="px-3 py-1.5 text-[10px] font-bold uppercase text-center">Óbito</div>
+          <div class="flex-none grid border-b-2 border-base-300 bg-[#b8b4ac]"
+            style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr">
+            <div class="px-3 py-1.5 text-[9px] font-bold uppercase border-r border-base-300">Nome</div>
+            <div class="px-3 py-1.5 text-[9px] font-bold uppercase border-r border-base-300">Relação</div>
+            <div class="px-3 py-1.5 text-[9px] font-bold uppercase border-r border-base-300 text-center">Sexo</div>
+            <div class="px-3 py-1.5 text-[9px] font-bold uppercase border-r border-base-300 text-center">Nasc.</div>
+            <div class="px-3 py-1.5 text-[9px] font-bold uppercase text-center">Óbito</div>
           </div>
-         
-          <div class="flex-1 overflow-y-auto bg-white">
+          <div class="flex-1 overflow-y-auto">
             <button
               v-for="r in todosParentes" :key="r.relId"
               type="button"
-              @click="$emit('abrirPessoa', r.pessoa)"
-              class="w-full text-left grid border-b border-gray-200 hover:brightness-95 transition-colors"
-              style="grid-template-columns: 2fr 2fr 1fr 1fr 1fr"
-              :style="{ backgroundColor: r.pessoa?.sexo === 'M' ? 'var(--color-male,#c8dce8)' : 'var(--color-female,#e8c8d8)' }"
-            >
-              <div class="px-3 py-2 font-bold text-sm uppercase border-r border-gray-300 truncate">
+              @click="emit('abrirPessoa', r.pessoa)"
+              class="w-full text-left grid border-b border-[#d0d0d0] hover:brightness-95 transition-colors"
+              style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr"
+              :style="corCard(r.pessoa?.sexo)">
+              <div class="px-3 py-2 font-bold text-xs uppercase border-r border-[#c8c8c8] truncate">
                 {{ r.pessoa?.sobrenome }}, {{ r.pessoa?.nome }}
               </div>
-              <div class="px-3 py-2 text-sm border-r border-gray-300 capitalize">{{ r.papel }}</div>
-              <div class="px-3 py-2 text-sm border-r border-gray-300 text-center font-bold">{{ r.pessoa?.sexo ?? '—' }}</div>
-              <div class="px-3 py-2 text-sm border-r border-gray-300 text-center font-mono">{{ r.pessoa?.datanasc?.substring(0,4) ?? '—' }}</div>
-              <div class="px-3 py-2 text-sm text-center font-mono">{{ r.pessoa?.datamorte?.substring(0,4) ?? '—' }}</div>
+              <div class="px-3 py-2 text-xs border-r border-[#c8c8c8] capitalize text-[#404040]">{{ r.papel }}</div>
+              <div class="px-3 py-2 text-xs border-r border-[#c8c8c8] text-center font-bold"
+                :class="r.pessoa?.sexo === 'M' ? 'text-blue-700' : r.pessoa?.sexo === 'F' ? 'text-pink-700' : ''">
+                {{ r.pessoa?.sexo ?? '—' }}
+              </div>
+              <div class="px-3 py-2 text-xs border-r border-[#c8c8c8] text-center font-mono text-[#404040]">{{ r.pessoa?.datanasc?.substring(0, 4) ?? '—' }}</div>
+              <div class="px-3 py-2 text-xs text-center font-mono text-[#707070]">{{ r.pessoa?.datamorte?.substring(0, 4) ?? '—' }}</div>
             </button>
-            <div v-if="!todosParentes.length" class="px-4 py-8 text-sm text-[#808080] italic text-center">
+            <div v-if="!todosParentes.length" class="px-4 py-8 text-xs text-[#909090] italic text-center">
               Nenhum parente cadastrado.
             </div>
           </div>
-      
-          <div class="flex-none border-t border-[#808080] px-3 py-1 bg-[#d4d0c8]">
-            <span class="text-xs text-[#404040]">{{ todosParentes.length }} parente(s) encontrado(s)</span>
+          <div class="flex-none border-t border-base-300 px-3 py-1 bg-base-100">
+            <span class="text-[9px] text-[#505050]">{{ todosParentes.length }} parente(s)</span>
           </div>
         </template>
       </div>
 
-    <!-- aba arvore -->
-<div v-show="abaAtiva === 'arvore'"
-  class="h-full flex flex-col items-center justify-center gap-4 p-8">
-  <Icon name="lucide:git-fork" class="text-5xl text-[#808080]" />
-  <p class="text-sm text-[#404040] text-center">
-    Clique para abrir a árvore de <strong>{{ pessoa.nome }} {{ pessoa.sobrenome }}</strong> em uma janela separada.
-  </p>
-  <button @click="$emit('verArvore', pessoa.id)"
-    class="border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] bg-[#d4d0c8] px-6 py-2 text-sm font-bold uppercase hover:brightness-110 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white flex items-center gap-2">
-    <Icon name="lucide:git-fork" class="text-sm" />
-    Abrir Árvore
-  </button>
-</div>
+      <!-- ─── Aba Buscar Relação ─── -->
+      <div v-show="abaAtiva === 'relacao'" class="h-full flex flex-col items-center justify-center gap-4 p-8">
+        <Icon name="lucide:git-branch" class="text-5xl text-[#b0b0b0]" />
+        <div class="text-center max-w-sm">
+          <p class="text-sm font-bold text-black mb-1">{{ pessoa.nome }} {{ pessoa.sobrenome }}</p>
+          <p class="text-xs text-[#505050]">
+            Encontre o caminho de parentesco entre esta pessoa e outra cadastrada no sistema.
+          </p>
+        </div>
+        <button @click="router.push('/buscar?id1=' + pessoa.id)"
+          class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 px-6 py-1.5 text-xs font-bold uppercase hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center gap-2">
+          <Icon name="lucide:git-branch" class="text-xs" />
+          Buscar Relação
+        </button>
+      </div>
+
+      <!-- ─── Aba Árvore ─── -->
+      <div v-show="abaAtiva === 'arvore'" class="h-full flex flex-col items-center justify-center gap-4 p-8">
+        <Icon name="lucide:git-fork" class="text-5xl text-[#b0b0b0]" />
+        <p class="text-sm text-[#505050] text-center">
+          Abrir a árvore genealógica de <strong>{{ pessoa.nome }} {{ pessoa.sobrenome }}</strong> em uma janela separada.
+        </p>
+        <button @click="emit('verArvore', pessoa.id)"
+          class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 px-6 py-1.5 text-xs font-bold uppercase hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center gap-2">
+          <Icon name="lucide:git-fork" class="text-xs" />
+          Abrir Árvore
+        </button>
+      </div>
 
     </div>
 
-    <!--todo: gambiarra fazer de vdd-->
-    <div class="flex-none px-3 py-2 border-t-2 border-[#808080] flex justify-between items-center bg-[#d4d0c8]">
-      <button @click="$emit('excluir', pessoa.id)"
-        class="text-xs uppercase font-bold px-4 py-1.5 bg-[#d4d0c8] border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] hover:bg-red-100 text-red-700 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white flex items-center gap-1">
-        <Icon name="lucide:trash-2" class="text-xs" /> Excluir
+    <!-- Barra de ações -->
+    <div class="flex-none px-3 py-2 border-t-2 border-base-300 flex justify-between items-center bg-base-100">
+      <button @click="confirmarExclusao"
+        class="text-[10px] uppercase font-bold px-3 py-1.5 bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 hover:bg-red-50 text-red-700 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center gap-1.5">
+        <Icon name="lucide:trash-2" class="text-[10px]" />
+        Excluir
       </button>
-      <div class="flex gap-2">
-        <button @click="$emit('fechar')"
-          class="text-xs uppercase font-bold px-5 py-1.5 bg-[#d4d0c8] border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] hover:brightness-110 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white">
+      <div class="flex gap-1.5">
+        <button @click="emit('fechar')"
+          class="text-[10px] uppercase font-bold px-4 py-1.5 bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white">
           Fechar
         </button>
-        <button @click="$emit('editar', pessoa.id)"
-          class="text-xs uppercase font-bold px-5 py-1.5 bg-[#d4d0c8] border-2 border-t-white border-l-white border-r-[#808080] border-b-[#808080] hover:brightness-110 active:border-t-[#808080] active:border-l-[#808080] active:border-r-white active:border-b-white flex items-center gap-1">
-          <Icon name="lucide:pencil" class="text-xs" /> Editar
+        <button @click="emit('editar', pessoa.id)"
+          class="text-[10px] uppercase font-bold px-4 py-1.5 bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center gap-1.5">
+          <Icon name="lucide:pencil" class="text-[10px]" />
+          Editar
         </button>
       </div>
     </div>
@@ -234,8 +288,6 @@
 </template>
 
 <script setup lang="ts">
-import * as f3 from 'family-chart'
-
 interface Pessoa {
   id: number
   nome: string
@@ -250,10 +302,13 @@ interface Pessoa {
   obs: string | null
 }
 
+type AbaId = 'pessoa' | 'parentes' | 'arvore' | 'relacao'
+
 const props = defineProps<{
   pessoa: Pessoa
   zIndex: number
   offset: number
+  ativa?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -262,61 +317,76 @@ const emit = defineEmits<{
   editar: [id: number]
   abrirPessoa: [pessoa: Pessoa]
   verArvore: [id: number]
+  trazerParaFrente: [id: number]
 }>()
 
-// Abas
-const abaAtiva = ref<'pessoa' | 'parentes' | 'arvore'>('pessoa')
-const abas = [
-  { id: 'pessoa',   label: 'Pessoa',   icon: 'lucide:user'        },
-  { id: 'parentes', label: 'Parentes', icon: 'lucide:users'       },
-  { id: 'arvore',   label: 'Árvore',   icon: 'lucide:git-fork'    },
+// ── Abas ─────────────────────────────────────────────────────────────
+const abaAtiva = ref<AbaId>('pessoa')
+const abas: { id: AbaId; label: string; icon: string }[] = [
+  { id: 'pessoa',   label: 'Pessoa',         icon: 'lucide:user'       },
+  { id: 'parentes', label: 'Parentes',       icon: 'lucide:users'      },
+  { id: 'arvore',   label: 'Árvore',         icon: 'lucide:git-fork'   },
+  { id: 'relacao',  label: 'Buscar Relação', icon: 'lucide:git-branch' },
 ]
 
-// Drag
-const pos = ref({ x: 80 + props.offset * 30, y: 40 + props.offset * 30 })
-let dragging = false
+const router = useRouter()
+
+// ── Drag com clamping de borda ────────────────────────────────────────
+const janela   = ref<HTMLElement | null>(null)
+const pos      = ref({ x: 80 + props.offset * 30, y: 40 + props.offset * 30 })
+let dragging   = false
 let startMouse = { x: 0, y: 0 }
 let startPos   = { x: 0, y: 0 }
 
 function iniciarDrag(e: MouseEvent) {
-  dragging = true
+  dragging   = true
   startMouse = { x: e.clientX, y: e.clientY }
   startPos   = { x: pos.value.x, y: pos.value.y }
   window.addEventListener('mousemove', onMove)
-  window.addEventListener('mouseup', pararDrag)
+  window.addEventListener('mouseup',  pararDrag)
 }
+
 function onMove(e: MouseEvent) {
   if (!dragging) return
-  pos.value = { x: startPos.x + (e.clientX - startMouse.x), y: startPos.y + (e.clientY - startMouse.y) }
+  const w   = janela.value?.offsetWidth  ?? 720
+  const h   = janela.value?.offsetHeight ?? 500
+  const newX = startPos.x + (e.clientX - startMouse.x)
+  const newY = startPos.y + (e.clientY - startMouse.y)
+  pos.value = {
+    x: Math.max(0, Math.min(newX, window.innerWidth  - w)),
+    y: Math.max(0, Math.min(newY, window.innerHeight - h)),
+  }
 }
+
 function pararDrag() {
   dragging = false
   window.removeEventListener('mousemove', onMove)
-  window.removeEventListener('mouseup', pararDrag)
+  window.removeEventListener('mouseup',  pararDrag)
 }
-function trazerParaFrente() {}
+
 onUnmounted(() => {
   window.removeEventListener('mousemove', onMove)
-  window.removeEventListener('mouseup', pararDrag)
+  window.removeEventListener('mouseup',  pararDrag)
 })
 
-// Dados
-const { data: arvoreRaw, pending: carregando } = await useFetch<any[]>(
-  () => `/api/pessoa?id=${props.pessoa.id}`
-)
-const { data: todosLocais }  = await useFetch<any[]>('/api/local')
-const { data: tiposRelacao } = await useFetch<any[]>('/api/tipo_relacao')
-const { data: todasPessoas } = await useFetch<any[]>('/api/pessoa')
+// ── Dados ─────────────────────────────────────────────────────────────
+const { data: arvoreRaw,   pending: carregando } = await useFetch<any[]>(() => `/api/pessoa?id=${props.pessoa.id}`)
+const { data: relacoesRaw }                      = await useFetch<any[]>(() => `/api/relacao?id=${props.pessoa.id}`)
+const { data: todosLocais  }                     = await useFetch<any[]>('/api/local')
+const { data: tiposRelacao }                     = await useFetch<any[]>('/api/tipo_relacao')
+const { data: todasPessoas }                     = await useFetch<any[]>('/api/pessoa')
 
-const localMap = computed(() =>
-  Object.fromEntries((todosLocais.value ?? []).map((l: any) => [l.id, l]))
-)
-const pessoaMap = computed(() =>
-  Object.fromEntries((todasPessoas.value ?? []).map((p: any) => [p.id, p]))
-)
-const tipoMap = computed(() =>
-  Object.fromEntries((tiposRelacao.value ?? []).map((t: any) => [t.id, t.descricao]))
-)
+const localMap  = computed(() => Object.fromEntries((todosLocais.value  ?? []).map((l: any) => [l.id, l])))
+const pessoaMap = computed(() => Object.fromEntries((todasPessoas.value ?? []).map((p: any) => [p.id, p])))
+const tipoMap   = computed(() => Object.fromEntries((tiposRelacao.value ?? []).map((t: any) => [t.id, t.descricao])))
+// relacao keyed by p2 (only type 2 = cônjuge) so we can look up wedding metadata
+const metadataCasamento = computed(() => {
+  const m: Record<number, any> = {}
+  for (const r of (relacoesRaw.value ?? [])) {
+    if (r.rel === 2) m[r.p2] = r.metadata ?? null
+  }
+  return m
+})
 
 function resolverLocal(id: number | null): string | null {
   if (!id) return null
@@ -324,13 +394,24 @@ function resolverLocal(id: number | null): string | null {
   return l ? `${l.descricao}${l.estado ? ' - ' + l.estado : ''}` : null
 }
 
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+
 function formatarData(data: string | null): string | null {
   if (!data) return null
   const d = new Date(data)
   d.setMinutes(d.getMinutes() + d.getTimezoneOffset())
-  const dia = String(d.getDate()).padStart(2, '0')
-  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-  return `${dia} ${meses[d.getMonth()]} ${d.getFullYear()}`
+  return `${String(d.getDate()).padStart(2, '0')} ${MESES[d.getMonth()]} ${d.getFullYear()}`
+}
+
+function anoVida(nasc?: string | null, morte?: string | null): string {
+  const n = nasc?.substring(0, 4)
+  const m = morte?.substring(0, 4)
+  if (!n) return '?'
+  return m ? `${n} – ${m}` : `${n} –`
+}
+
+function corCard(sexo?: string | null): { backgroundColor: string } {
+  return { backgroundColor: sexo === 'M' ? 'var(--color-male, #c8dce8)' : sexo === 'F' ? 'var(--color-female, #e8c8d8)' : '#e8e8e8' }
 }
 
 const eventosVitais = computed(() => [
@@ -342,60 +423,28 @@ const eventosVitais = computed(() => [
 const detalhes = computed(() => {
   if (!arvoreRaw.value) return null
   const pais: any[] = [], conjuges: any[] = [], filhos: any[] = [], outros: any[] = []
-  const diretas = (arvoreRaw.value as any[]).filter(r => r.o_depth <= 1)
-  for (const r of diretas) {
-    const outro = pessoaMap.value[r.o_point2] ?? null
+  for (const r of (arvoreRaw.value as any[]).filter(r => r.o_depth <= 1)) {
+    const pessoa = pessoaMap.value[r.o_point2] ?? null
     const relTipo = r.o_link_rel
-    const entrada = { relId: r.o_point2, tipo: relTipo, tipoDescricao: tipoMap.value[relTipo] ?? '', pessoa: outro, metadata: null as any, papel: '' }
-    if      (relTipo === 1) { entrada.papel = 'pai / mãe';    pais.push(entrada)     }
-    else if (relTipo === 2) { entrada.papel = 'cônjuge';      conjuges.push(entrada) }
-    else if (relTipo === 3) { entrada.papel = 'filho / filha'; filhos.push(entrada)  }
+    const metadata = relTipo === 2 ? (metadataCasamento.value[r.o_point2] ?? null) : null
+    const entrada = { relId: r.o_point2, pessoa, metadata, papel: '' }
+    if      (relTipo === 1) { entrada.papel = 'pai / mãe';     pais.push(entrada)     }
+    else if (relTipo === 2) { entrada.papel = 'cônjuge';       conjuges.push(entrada) }
+    else if (relTipo === 3) { entrada.papel = 'filho / filha'; filhos.push(entrada)   }
     else                    { entrada.papel = tipoMap.value[relTipo] ?? 'outro'; outros.push(entrada) }
   }
   return { familia: { pais, conjuges, filhos, outros } }
 })
 
-// Lista plana de todos os parentes para a aba Parentes
 const todosParentes = computed(() => {
   if (!detalhes.value) return []
-  return [
-    ...detalhes.value.familia.pais,
-    ...detalhes.value.familia.conjuges,
-    ...detalhes.value.familia.filhos,
-    ...detalhes.value.familia.outros,
-  ]
+  const { pais, conjuges, filhos, outros } = detalhes.value.familia
+  return [...pais, ...conjuges, ...filhos, ...outros]
 })
 
-// Árvore — carrega quando a aba é ativada
-const arvoreData = ref<any[]>([])
-const arvoreCarregada = ref(false)
-
-const router = useRouter()
-function irParaArvore() {
-  router.push({ path: '/arvore', query: { id: props.pessoa.id } })
-  emit('fechar')
-}
-
-function renderizarArvore() {
-  const containerId = `#arvore-${props.pessoa.id}`
-  const el = document.querySelector(containerId)
-  if (!el || !arvoreData.value.length) return
-
-  const chart = f3.createChart(containerId, arvoreData.value)
-    .setTransitionTime(800)
-    .setCardXSpacing(280)
-    .setCardYSpacing(140)
-    .setSingleParentEmptyCard(true, { label: 'Desconhecido' })
-    .setOrientationVertical()
-
-  chart.setCardHtml()
-    .setCardDisplay([['first name', 'last name'], ['birth year'], ['death year']])
-    .setCardDim({ width: 220 })
-    .setMiniTree(true)
-    .setStyle('rect')
-    .setOnHoverPathToMain()
-
-  chart.updateMainId(String(props.pessoa.id))
-  chart.updateTree({ initial: true })
+function confirmarExclusao() {
+  if (confirm(`Excluir ${props.pessoa.nome} ${props.pessoa.sobrenome}?\n\nEsta ação não pode ser desfeita. Todos os vínculos desta pessoa também serão removidos.`)) {
+    emit('excluir', props.pessoa.id)
+  }
 }
 </script>
