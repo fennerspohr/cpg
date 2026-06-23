@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import PathChartView from './PathChartView.vue'
+import PathChartView from './PathchartView.vue'
 
 interface Pessoa {
   id: number; nome: string; sobrenome: string; sexo: string | null
