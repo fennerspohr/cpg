@@ -1,4 +1,5 @@
 const { app, BrowserWindow, dialog } = require('electron')
+const { pathToFileURL } = require('url')
 const path = require('path')
 const http = require('http')
 const fs = require('fs')
@@ -54,7 +55,7 @@ async function startNuxtServer() {
   process.env.NODE_ENV = 'production'
 
   // Dynamically import the Nuxt server (it starts listening on import)
-  await import(serverPath)
+await import(pathToFileURL(serverPath).href)
 
   // Wait until it's actually responding
   await waitForServer()
