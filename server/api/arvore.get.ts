@@ -92,13 +92,14 @@ return data;
             var children = []
 
             for(const [idx, value] of p1.entries()){
-                if(value == pessoas[p].id && relacoes[idx] == 1){
+                if(value == pessoas[p].id && relacoes[idx] == 1 && !parents.includes(`"${p2[idx]}"`)){
+                  console.log(parents, `"${p2[idx]}"`)
                     parents.push(`"${p2[idx]}"`);
                 }
-                else if(value == pessoas[p].id && relacoes[idx] == 2){
+                else if(value == pessoas[p].id && relacoes[idx] == 2 && !spouses.includes(`"${p2[idx]}"`)){
                     spouses.push(`"${p2[idx]}"`);
                 }
-                else if(value == pessoas[p].id && relacoes[idx] == 3){
+                else if(value == pessoas[p].id && relacoes[idx] == 3 && !children.includes(`"${p2[idx]}"`)){
                     children.push(`"${p2[idx]}"`);
                 }
             }
