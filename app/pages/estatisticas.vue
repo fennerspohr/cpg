@@ -225,7 +225,7 @@ const cards = computed(() => {
     : 0
   return [
     { label: 'Pessoas',         valor: d.value.totalPessoas,    icon: 'lucide:users',      cls: 'text-blue-700',   sub: 'registros cadastrados' },
-    { label: 'Vínculos',        valor: d.value.totalRelacoes,   icon: 'lucide:link',       cls: 'text-purple-700', sub: 'relações familiares' },
+    { label: 'Vínculos',        valor: d.value.totalRelacoes/2,   icon: 'lucide:link',       cls: 'text-purple-700', sub: 'relações familiares' },
     { label: 'Sobrenomes',      valor: d.value.totalSobrenomes, icon: 'lucide:tag',        cls: 'text-teal-700',   sub: 'sobrenomes distintos' },
     { label: 'Sem vínculo',     valor: d.value.semVinculo,      icon: 'lucide:user-x',    cls: 'text-red-700',    sub: 'pessoas isoladas' },
     { label: 'Média vínculos',  valor: d.value.mediaRelacoes,   icon: 'lucide:share-2',   cls: 'text-orange-700', sub: 'por pessoa' },
