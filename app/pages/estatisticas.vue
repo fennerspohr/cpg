@@ -116,7 +116,7 @@
                     :style="{ backgroundColor: p.sexo === 'M' ? 'var(--color-male)' : p.sexo === 'F' ? 'var(--color-female)' : '' }">
                     <td class="py-1 px-1.5 text-[9px] font-mono text-win-muted">{{ i + 1 }}</td>
                     <td class="py-1 px-1.5 text-[9px] font-bold uppercase leading-tight">{{ p.sobrenome }}, {{ p.nome }}</td>
-                    <td class="py-1 px-1.5 text-[10px] font-mono font-bold text-center">{{ p.total }}</td>
+                    <td class="py-1 px-1.5 text-[10px] font-mono font-bold text-center">{{ p.total/2 }}</td>
                   </tr>
                 </tbody>
               </table>
