@@ -4,7 +4,7 @@
       v-if="state.visible"
       class="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4"
       @keydown.enter="close"
-      @keydown.esc="close"
+      @keydown.esc="state.type === 'confirm' ? cancel() : close()"
     >
       <div class="w-full max-w-sm bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 shadow-[2px_2px_10px_rgba(0,0,0,0.5)]">
 
@@ -17,7 +17,7 @@
             {{ titulo }}
           </span>
           <button
-            @click="close"
+            @click="state.type === 'confirm' ? cancel() : close()"
             class="bg-base-100 border border-t-white border-l-white border-r-black border-b-black w-4 h-4 flex items-center justify-center text-xs pb-0.5 leading-none shadow-sm hover:bg-[#e0e0e0] active:border-t-black active:border-l-black active:border-r-white active:border-b-white"
           >
             ×
@@ -25,11 +25,27 @@
         </div>
 
         <div class="p-4 bg-base-100">
-          <p class="text-sm">{{ state.message }}</p>
+          <p class="text-sm whitespace-pre-line">{{ state.message }}</p>
         </div>
 
-        <div class="p-2 flex justify-end bg-base-100">
+        <div class="p-2 flex justify-end gap-2 bg-base-100">
+          <template v-if="state.type === 'confirm'">
+            <button
+              @click="cancel"
+              class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white bg-base-100 text-xs py-1 px-6 font-bold"
+            >
+              Não
+            </button>
+            <button
+              ref="okButton"
+              @click="close"
+              class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white bg-base-100 text-xs py-1 px-6 font-bold"
+            >
+              Sim
+            </button>
+          </template>
           <button
+            v-else
             ref="okButton"
             @click="close"
             class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white bg-base-100 text-xs py-1 px-6 font-bold"
@@ -43,18 +59,20 @@
 </template>
 
 <script setup lang="ts">
-const { state, close } = useAppAlert()
+const { state, close, cancel } = useAppAlert()
 const okButton = ref<HTMLButtonElement | null>(null)
 
 const titulo = computed(() => {
   if (state.type === 'success') return 'Sucesso'
   if (state.type === 'error') return 'Erro'
+  if (state.type === 'confirm') return 'Confirmação'
   return 'Aviso'
 })
 
 const icon = computed(() => {
   if (state.type === 'success') return 'lucide:check-circle'
   if (state.type === 'error') return 'lucide:x-circle'
+  if (state.type === 'confirm') return 'lucide:help-circle'
   return 'lucide:info'
 })
 
@@ -64,9 +82,6 @@ const headerColor = computed(() => {
   return 'bg-primary'
 })
 
-// Garante que o foco fique no botao OK quando o alerta abre,
-// e que volte para o conteudo da pagina ao fechar (sem precisar
-// do Alt+Tab que o alert() nativo exigia no Windows).
 watch(() => state.visible, async (visible) => {
   if (visible) {
     await nextTick()

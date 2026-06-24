@@ -8,6 +8,8 @@
       <slot />
     </main>
 
+    <AppAlert />
+
     <div class="fixed inset-0 pointer-events-none z-50">
       <ModalLocal
         v-if="modalCidadeAberto"

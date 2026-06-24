@@ -256,7 +256,9 @@
 
 <script setup lang="ts">
 const router = useRouter()
+const { success, error, confirm } = useAppAlert()
 const loading = ref(false)
+const cadastroRealizado = ref(false)
 const modalLocalAberto = ref(false)
 const painelAberto = ref(false)
 const buscaLateral = ref('')
@@ -305,10 +307,11 @@ onBeforeRouteLeave((_to, _from, next) => {
     next()
     return
   }
-  const ok = confirm(
-    'Você tem um cadastro em andamento.\n\nDeseja descartar as alterações e sair?'
+  confirm(
+    'Você tem um cadastro em andamento.\n\nDeseja descartar as alterações e sair?',
+    () => next(),
+    () => next(false),
   )
-  next(ok)
 })
 
 const pessoasFiltradas = computed(() => {
@@ -355,12 +358,18 @@ function verificarSeEhConjuge(idRelacao: number | null): boolean {
 }
 
 function cancelar() {
-  if (formSujo.value) {
-    const ok = confirm('Deseja descartar as alterações e voltar?')
-    if (!ok) return
+  if (!formSujo.value) {
+    cadastroRealizado.value = true
+    router.back()
+    return
   }
-  cadastroRealizado.value = true
-  router.back()
+  confirm(
+    'Deseja descartar as alterações e voltar?',
+    () => {
+      cadastroRealizado.value = true
+      router.back()
+    },
+  )
 }
 
 async function handleSubmit() {
@@ -405,8 +414,7 @@ async function handleSubmit() {
 
     await $fetch('/api/pessoa', { method: 'POST', body: payload })
     cadastroRealizado.value = true
-    success('Cadastro concluído com sucesso!')
-    router.push('/')
+    success('Cadastro concluído com sucesso!', () => router.push('/'))
   } catch (err) {
     const msg = (err as { data?: { message?: string }; message?: string })?.data?.message
       ?? (err instanceof Error ? err.message : 'Verifique os dados.')

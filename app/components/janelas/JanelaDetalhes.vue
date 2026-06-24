@@ -111,23 +111,20 @@
               <span class="text-[9px] font-bold uppercase text-win-text tracking-widest whitespace-nowrap">Filiação</span>
               <div class="flex-1 h-px bg-base-300" />
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div v-for="(label, i) in ['Pai', 'Mãe']" :key="label">
-                <p class="text-[9px] font-bold uppercase text-win-text mb-1">{{ label }}</p>
-                <button v-if="detalhes.familia.pais[i]"
-                  type="button"
-                  @click="emit('abrirPessoa', detalhes.familia.pais[i].pessoa)"
-                  class="w-full text-left border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-2 hover:brightness-95 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center justify-between gap-2"
-                  :style="corCard(detalhes.familia.pais[i].pessoa?.sexo)">
-                  <div class="min-w-0">
-                    <p class="text-xs font-bold uppercase truncate leading-tight">{{ detalhes.familia.pais[i].pessoa?.sobrenome }}, {{ detalhes.familia.pais[i].pessoa?.nome }}</p>
-                    <p class="text-[9px] font-mono text-win-muted mt-0.5">{{ anoVida(detalhes.familia.pais[i].pessoa?.datanasc, detalhes.familia.pais[i].pessoa?.datamorte) }}</p>
-                  </div>
-                  <Icon name="lucide:chevron-right" class="text-win-dim text-xs flex-none" />
-                </button>
-                <p v-else class="text-xs text-win-dim italic px-1 py-2">—</p>
-              </div>
+            <div v-if="detalhes.familia.pais.length" class="grid grid-cols-2 gap-2">
+              <button v-for="(rel, i) in detalhes.familia.pais" :key="i"
+                type="button"
+                @click="emit('abrirPessoa', rel.pessoa)"
+                class="w-full text-left border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-2 hover:brightness-95 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center justify-between gap-2"
+                :style="corCard(rel.pessoa?.sexo)">
+                <div class="min-w-0">
+                  <p class="text-xs font-bold uppercase truncate leading-tight">{{ rel.pessoa?.sobrenome }}, {{ rel.pessoa?.nome }}</p>
+                  <p class="text-[9px] font-mono text-win-muted mt-0.5">{{ anoVida(rel.pessoa?.datanasc, rel.pessoa?.datamorte) }}</p>
+                </div>
+                <Icon name="lucide:chevron-right" class="text-win-dim text-xs flex-none" />
+              </button>
             </div>
+            <p v-else class="text-xs text-win-dim italic px-1 py-2">—</p>
           </div>
 
           <!-- Cônjuge(s) -->

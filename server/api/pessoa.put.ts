@@ -33,10 +33,8 @@ async function updateRelations(id: number, currentRelations: Relacao[]) {
   for (const r of currentRelations) {
     const foundIdx = previousRelations.findIndex(rel => rel.id === r.id)
     if (foundIdx !== -1) {
-      // relação já existia — remove da lista de "a deletar"
       previousRelations.splice(foundIdx, 1)
     } else {
-      // nova relação — cria no banco
       await db.insert(relacao).values({
         p1: id,
         p2: r.p2,

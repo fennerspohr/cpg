@@ -116,68 +116,102 @@
             <div v-for="(rel, index) in form.relacoes" :key="index"
               class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-win-card p-3 flex flex-col gap-2">
 
-              <div class="flex items-center gap-2">
-                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 flex-none"
-                  :class="rel.id ? 'bg-[#d4f0d4] text-green-800 border border-green-400' : 'bg-[#ffd4a8] text-orange-800 border border-orange-300'">
-                  {{ rel.id ? 'existente' : 'novo' }}
+              <!-- Relação existente: somente leitura -->
+              <template v-if="rel.id">
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 flex-none bg-[#d4f0d4] text-green-800 border border-green-400">
+                    existente
+                  </span>
+                  <span class="flex-1 px-2 py-1 text-xs border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-base-200 text-win-muted">
+                    {{ tiposRelacao?.find((t: any) => t.id === rel.rel)?.descricao ?? '—' }}
+                  </span>
+                  <button type="button" @click="removerRelacao(index)"
+                    class="flex-none border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 w-6 h-6 text-sm font-bold text-red-700 hover:bg-red-50 flex items-center justify-center">
+                    ×
+                  </button>
+                </div>
+                <span class="px-2 py-1 text-xs border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-base-200 text-win-muted">
+                  {{ pessoasExistentes?.find((p: any) => p.id === rel.p2)
+                    ? `${pessoasExistentes.find((p: any) => p.id === rel.p2).sobrenome}, ${pessoasExistentes.find((p: any) => p.id === rel.p2).nome} (${String(rel.p2).padStart(3, '0')})`
+                    : `ID ${rel.p2}` }}
                 </span>
-                <select v-model="rel.rel" required
-                  class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none">
-                  <option :value="null">Tipo de vínculo...</option>
-                  <option v-for="tipo in tiposRelacao" :key="tipo.id" :value="tipo.id">{{ tipo.descricao }}</option>
-                </select>
-                <button type="button" @click="removerRelacao(index)"
-                  class="flex-none border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 w-6 h-6 text-sm font-bold text-red-700 hover:bg-red-50 flex items-center justify-center">
-                  ×
-                </button>
-              </div>
+                <div v-if="verificarSeEhConjuge(rel.rel)"
+                  class="grid grid-cols-2 gap-3 pt-2 border-t border-dashed border-win-border-light">
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-bold uppercase text-blue-900">Data do casamento</label>
+                    <span class="px-2 py-1 text-xs border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-base-200 text-win-muted">
+                      {{ rel.metadata?.data_casamento ?? '—' }}
+                    </span>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-bold uppercase text-blue-900">Local do casamento</label>
+                    <span class="px-2 py-1 text-xs border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-base-200 text-win-muted">
+                      {{ locais?.find((l: any) => l.id === rel.metadata?.local_casamento)?.descricao ?? '—' }}
+                    </span>
+                  </div>
+                </div>
+              </template>
 
-              <div class="flex items-center gap-2">
-                <button type="button" @click="alternarModoNovo(index)"
-                  class="flex-none border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 text-[9px] font-bold uppercase px-2 py-1 hover:brightness-110 whitespace-nowrap">
-                  {{ rel.isNovo ? '← Lista' : '+ Novo' }}
-                </button>
-
-                <template v-if="rel.isNovo">
-                  <input v-model="rel.novoParente.nome" type="text" placeholder="Nome *"
-                    class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none focus:bg-win-focus" />
-                  <input v-model="rel.novoParente.sobrenome" type="text" placeholder="Sobrenome *"
-                    class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none focus:bg-win-focus" />
-                  <select v-model="rel.novoParente.sexo"
-                    class="w-20 flex-none bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-1 py-1 text-xs outline-none">
-                    <option value="M">Masc.</option>
-                    <option value="F">Fem.</option>
+              <!-- Relação nova: editável -->
+              <template v-else>
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 flex-none bg-[#ffd4a8] text-orange-800 border border-orange-300">
+                    novo
+                  </span>
+                  <select v-model="rel.rel" required
+                    class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none">
+                    <option :value="null">Tipo de vínculo...</option>
+                    <option v-for="tipo in tiposRelacao" :key="tipo.id" :value="tipo.id">{{ tipo.descricao }}</option>
                   </select>
-                </template>
-
-                <select v-else v-model="rel.p2" required
-                  class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none">
-                  <option :value="null">— Selecione uma pessoa —</option>
-                  <option v-for="p in pessoasExistentes" :key="p.id" :value="p.id" :disabled="p.id === pessoaId">
-                    {{ p.sobrenome }}, {{ p.nome }}
-                    ({{ String(p.id).padStart(3, '0') }}{{ p.datanasc ? ' · ' + p.datanasc.substring(0,4) : '' }})
-                    {{ p.id === pessoaId ? '← você' : '' }}
-                  </option>
-                </select>
-              </div>
-
-              <div v-if="verificarSeEhConjuge(rel.rel)"
-                class="grid grid-cols-2 gap-3 pt-2 border-t border-dashed border-win-border-light">
-                <div class="flex flex-col gap-1">
-                  <label class="text-[9px] font-bold uppercase text-blue-900">Data do casamento</label>
-                  <input v-model="rel.metadata.data_casamento" type="date"
-                    class="bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none w-full" />
+                  <button type="button" @click="removerRelacao(index)"
+                    class="flex-none border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 w-6 h-6 text-sm font-bold text-red-700 hover:bg-red-50 flex items-center justify-center">
+                    ×
+                  </button>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-[9px] font-bold uppercase text-blue-900">Local do casamento</label>
-                  <LocalSelect
-                    v-model="rel.metadata.local_casamento"
-                    :locais="locais ?? []"
-                    placeholder="Selecione..."
-                    @novoLocal="modalLocalAberto = true"
-                  />
+                <div class="flex items-center gap-2">
+                  <button type="button" @click="alternarModoNovo(index)"
+                    class="flex-none border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 text-[9px] font-bold uppercase px-2 py-1 hover:brightness-110 whitespace-nowrap">
+                    {{ rel.isNovo ? '← Lista' : '+ Novo' }}
+                  </button>
+                  <template v-if="rel.isNovo">
+                    <input v-model="rel.novoParente.nome" type="text" placeholder="Nome *"
+                      class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none focus:bg-win-focus" />
+                    <input v-model="rel.novoParente.sobrenome" type="text" placeholder="Sobrenome *"
+                      class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none focus:bg-win-focus" />
+                    <select v-model="rel.novoParente.sexo"
+                      class="w-20 flex-none bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-1 py-1 text-xs outline-none">
+                      <option value="M">Masc.</option>
+                      <option value="F">Fem.</option>
+                    </select>
+                  </template>
+                  <select v-else v-model="rel.p2" required
+                    class="flex-1 bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none">
+                    <option :value="null">— Selecione uma pessoa —</option>
+                    <option v-for="p in pessoasExistentes" :key="p.id" :value="p.id" :disabled="p.id === pessoaId">
+                      {{ p.sobrenome }}, {{ p.nome }}
+                      ({{ String(p.id).padStart(3, '0') }}{{ p.datanasc ? ' · ' + p.datanasc.substring(0,4) : '' }})
+                      {{ p.id === pessoaId ? '← você' : '' }}
+                    </option>
+                  </select>
                 </div>
-              </div>
+                <div v-if="verificarSeEhConjuge(rel.rel)"
+                  class="grid grid-cols-2 gap-3 pt-2 border-t border-dashed border-win-border-light">
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-bold uppercase text-blue-900">Data do casamento</label>
+                    <input v-model="rel.metadata.data_casamento" type="date"
+                      class="bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1 text-xs outline-none w-full" />
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-bold uppercase text-blue-900">Local do casamento</label>
+                    <LocalSelect
+                      v-model="rel.metadata.local_casamento"
+                      :locais="locais ?? []"
+                      placeholder="Selecione..."
+                      @novoLocal="modalLocalAberto = true"
+                    />
+                  </div>
+                </div>
+              </template>
             </div>
 
             <button type="button" @click="adicionarRelacao"
