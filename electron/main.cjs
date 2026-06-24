@@ -144,8 +144,6 @@ function createWindow() {
 
   mainWindow.loadURL(`http://localhost:${PORT}`)
 
-  // Quando a janela principal ganha foco, traz as filhas para cima
-  // sem roubar o foco delas (moveTop não foca, só reordena o z).
   mainWindow.on('focus', () => {
     BrowserWindow.getAllWindows()
       .filter(w => w !== mainWindow && !w.isMinimized())

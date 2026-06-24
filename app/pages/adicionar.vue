@@ -256,11 +256,10 @@
 
 <script setup lang="ts">
 const router = useRouter()
-const loading           = ref(false)
-const modalLocalAberto  = ref(false)
-const painelAberto      = ref(false)
-const buscaLateral      = ref('')
-const cadastroRealizado = ref(false)
+const loading = ref(false)
+const modalLocalAberto = ref(false)
+const painelAberto = ref(false)
+const buscaLateral = ref('')
 
 interface PessoaForm {
   [key: string]: any
@@ -405,13 +404,13 @@ async function handleSubmit() {
     }
 
     await $fetch('/api/pessoa', { method: 'POST', body: payload })
-    cadastroRealizado.value = true   // desativa o guard antes de navegar
-    alert('Cadastro concluído com sucesso!')
+    cadastroRealizado.value = true
+    success('Cadastro concluído com sucesso!')
     router.push('/')
   } catch (err) {
     const msg = (err as { data?: { message?: string }; message?: string })?.data?.message
       ?? (err instanceof Error ? err.message : 'Verifique os dados.')
-    alert('Erro ao gravar: ' + msg)
+    error('Erro ao gravar: ' + msg)
   } finally {
     loading.value = false
   }

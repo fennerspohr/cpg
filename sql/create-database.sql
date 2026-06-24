@@ -1,40 +1,49 @@
--- CREATE USER cpg WITH PASSWORD 'cpg';
--- GRANT ALL PRIVILEGES ON DATABASE cpg TO cpg;
-
-CREATE TABLE Local(
-    id SERIAL PRIMARY KEY,
-    descricao VARCHAR(100)
+CREATE SCHEMA "drizzle";
+CREATE TABLE "local" (
+	"id" serial PRIMARY KEY,
+	"descricao" varchar(100) NOT NULL,
+	"estado" varchar(100)
 );
-
-CREATE TABLE Pessoa(
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(100),
-    sexo CHAR(1),
-    dataNasc DATE,
-    localNasc INT REFERENCES Local(id),
-    dataBatismo DATE,
-    localBatismo INT REFERENCES Local(id),
-    dataMorte DATE,
-    localMorte INT REFERENCES Local(id),
-    obs text,
-    creation_time TIMESTAMP
+CREATE TABLE "pessoa" (
+	"id" serial PRIMARY KEY,
+	"nome" varchar(100) NOT NULL,
+	"sexo" char(1),
+	"datanasc" date,
+	"localnasc" integer,
+	"databatismo" date,
+	"localbatismo" integer,
+	"datamorte" date,
+	"localmorte" integer,
+	"obs" text,
+	"creation_time" timestamp DEFAULT now() NOT NULL,
+	"sobrenome" varchar(100) NOT NULL
 );
-
-CREATE TABLE Tipo_Relacao(
-    id SERIAL PRIMARY KEY,
-    descricao VARCHAR(100)
+CREATE TABLE "relacao" (
+	"p1" integer NOT NULL,
+	"p2" integer NOT NULL,
+	"rel" integer NOT NULL,
+	"metadata" jsonb,
+	"creation_time" timestamp DEFAULT now() NOT NULL,
+	"id" serial PRIMARY KEY,
+	CONSTRAINT "p_unique" UNIQUE("p1","p2"),
+	CONSTRAINT "p_diff" CHECK ((p1 <> p2))
 );
-
-CREATE TABLE Relacao(
-    id SERIAL PRIMARY KEY,
-    p1 INT REFERENCES Pessoa(id),
-    p2 INT REFERENCES Pessoa(id),
-    rel INT REFERENCES Tipo_Relacao(id),
-    metadata JSONB,
-    creation_time TIMESTAMP,
-    constraint p_diff check (p1<>p2),
-    constraint p_unique unique (p1, p2)
+CREATE TABLE "tipo_relacao" (
+	"id" serial PRIMARY KEY,
+	"descricao" varchar(100) NOT NULL
 );
-
-CREATE INDEX idx_relacao_p1 ON Relacao(p1);
-CREATE INDEX idx_relacao_p2 ON Relacao(p2);
+CREATE TABLE "drizzle"."__drizzle_migrations" (
+	"id" serial PRIMARY KEY,
+	"hash" text NOT NULL,
+	"created_at" bigint
+);
+CREATE INDEX "idx_relacao_p1" ON "relacao" ("p1");
+CREATE INDEX "idx_relacao_p2" ON "relacao" ("p2");
+ALTER TABLE "pessoa" ADD CONSTRAINT "pessoa_localbatismo_local_id_fk" FOREIGN KEY ("localbatismo") REFERENCES "local"("id");
+ALTER TABLE "pessoa" ADD CONSTRAINT "pessoa_localmorte_local_id_fk" FOREIGN KEY ("localmorte") REFERENCES "local"("id");
+ALTER TABLE "pessoa" ADD CONSTRAINT "pessoa_localnasc_local_id_fk" FOREIGN KEY ("localnasc") REFERENCES "local"("id");
+ALTER TABLE "relacao" ADD CONSTRAINT "relacao_p1_pessoa_id_fk" FOREIGN KEY ("p1") REFERENCES "pessoa"("id");
+ALTER TABLE "relacao" ADD CONSTRAINT "relacao_p2_pessoa_id_fk" FOREIGN KEY ("p2") REFERENCES "pessoa"("id");
+ALTER TABLE "relacao" ADD CONSTRAINT "relacao_rel_tipo_relacao_id_fk" FOREIGN KEY ("rel") REFERENCES "tipo_relacao"("id");
+ 
+INSERT INTO "tipo_relacao" ("id", "descricao") VALUES (1, 'MÃE/PAI'), (2, 'CÔNJUGE'), (3, 'FILHO/A');
