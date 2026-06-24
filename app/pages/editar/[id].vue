@@ -284,6 +284,7 @@
 const route    = useRoute()
 const router   = useRouter()
 const pessoaId = Number(route.params.id)
+const { success, error, confirm } = useAppAlert()
 
 const loading          = ref(false)
 const modalLocalAberto = ref(false)
@@ -431,12 +432,12 @@ async function handleSubmit() {
     }
 
     await $fetch('/api/pessoa', { method: 'PUT', body: payload })
-    alert('Alterações salvas com sucesso!')
+    success('Alterações salvas com sucesso!')
     router.push('/')
   } catch (err) {
     const msg = (err as { data?: { message?: string }; message?: string })?.data?.message
       ?? (err instanceof Error ? err.message : 'Verifique os dados.')
-    alert('Erro ao salvar: ' + msg)
+    error('Erro ao salvar: ' + msg)
   } finally {
     loading.value = false
   }
