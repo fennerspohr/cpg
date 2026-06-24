@@ -66,7 +66,8 @@ async function salvarRapido() {
     })
     emit('saved', data)
   } catch (err) {
-    alert('Erro ao realizar cadastro rápido.')
+    const { error } = useAppAlert()
+    error('Erro ao realizar cadastro rápido.')
   } finally {
     carregando.value = false
   }

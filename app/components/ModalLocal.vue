@@ -140,7 +140,8 @@ async function salvarLocal() {
     estado.value = ''
     refresh()
   } catch (err) {
-    alert('Erro ao salvar local')
+    const { error } = useAppAlert()
+    error('Erro ao salvar local')
   } finally {
     carregando.value = false
   }

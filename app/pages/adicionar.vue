@@ -258,6 +258,8 @@ const modalLocalAberto = ref(false)
 const painelAberto = ref(false)
 const buscaLateral = ref('')
 
+const { success, error } = useAppAlert()
+
 interface PessoaForm {
   [key: string]: any
   nome: string; sobrenome: string; sexo: string
@@ -386,10 +388,11 @@ async function handleSubmit() {
     }
 
     await $fetch('/api/pessoa', { method: 'POST', body: payload })
-    alert('Cadastro concluído com sucesso!')
+    success('Cadastro concluído com sucesso!')
     router.push('/')
   } catch (err: any) {
-    alert('Erro ao gravar: ' + (err.data?.message || err.message || 'Verifique os dados.'))
+    error('Erro ao gravar: ' + (err.data?.message || err.message || 'Verifique os dados.'))
+
   } finally {
     loading.value = false
   }
