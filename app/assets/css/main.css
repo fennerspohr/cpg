@@ -7,29 +7,38 @@
   color-scheme: "light";
 }
 @theme{
-  /* fundo */
-  --color-base-100: #d4d0c8; 
-  /* destaque */
-  --color-base-200: #e0ddd8; 
-  /* cor das bordas */
+  /* cores bases */
+  --color-base-100: #d4d0c8;
+  --color-base-200: #e0ddd8;
   --color-base-300: #808080;
-  /* cor do texto principal */
-  --color-base-content: oklch(20% 0.01 240); 
+  --color-base-content: oklch(20% 0.01 240);
+  --color-primary: #0a246a;
 
-  /* azul */
-  --color-primary: #0a246a; 
+  /* cores de genero*/
+  --color-male: #c0c0ff;
+  --color-female: #ffc0c0;
 
-  --color-male: #C0C0FF;
-  --color-female: #FFC0C0;
+  /* cores Windows 95*/
+  --color-win-bg:           #c0c0c0;   /* fundo padrão W95 */
+  --color-win-navy:         #000080;   /* barra de título ativa */
+  --color-win-edit:         #7b3f00;   /* modo edição (marrom) */
+  --color-win-text:         #404040;   /* texto escuro */
+  --color-win-muted:        #606060;   /* texto secundário */
+  --color-win-muted-dark:   #505050;   /* texto secundário mais escuro */
+  --color-win-dim:          #909090;   /* texto/ícone apagado */
+  --color-win-focus:        #ffffcc;   /* fundo de input com foco */
+  --color-win-badge:        #fff3cd;   /* badge modo edição */
+  --color-win-badge-border: #f0c040;   /* borda do badge edição */
+  --color-win-card:         #e4e0d8;   /* card de vínculo */
+  --color-win-border-light: #b0b0b0;   /* borda mais clara */
 
-  /* quadrados */
+  /* deixa tudo quadrado */
   --radius-selector: 0rem;
   --radius-field: 0rem;
   --radius-box: 0rem;
 }
 
-:root {
-  display: block};
+/* cores arvore */
 
 #FamilyChart {
   background: white !important;

@@ -1,34 +1,27 @@
 <template>
-  <NuxtLink
-    v-if="to"
-    :to="to"
+  <component
+    :is="to ? nuxtLink : 'button'"
+    v-bind="to ? { to } : { type: 'button' }"
     class="nav-btn group"
   >
     <Icon :name="icon" class="icon-style" :class="iconClass" />
     <span class="label-style">{{ label }}</span>
-  </NuxtLink>
-
-  <button
-    v-else
-    type="button"
-    class="nav-btn group"
-  >
-    <Icon :name="icon" class="icon-style" :class="iconClass" />
-    <span class="label-style">{{ label }}</span>
-  </button>
+  </component>
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  label: string;
-  icon: string;
-  to?: string;
-  iconClass?: string;
-}>();
+  label: string
+  icon: string
+  to?: string
+  iconClass?: string
+}>()
+
+const nuxtLink = resolveComponent('NuxtLink')
 </script>
 
 <style scoped>
-@reference "../assets/css/main.css";
+@reference "../../assets/css/main.css";
 
 .nav-btn {
   @apply flex flex-col items-center justify-center w-24 h-16 bg-base-100

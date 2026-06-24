@@ -1,5 +1,5 @@
-<template>
-  <div class="flex h-full bg-[#c0c0c0] font-sans overflow-hidden">
+﻿<template>
+  <div class="flex h-full bg-win-bg font-sans overflow-hidden">
 
     <!-- CONTEÚDO PRINCIPAL -->
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
@@ -24,7 +24,7 @@
       <!-- Seletor de pessoa -->
       <div class="flex-none px-2 pb-1">
         <fieldset class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 pt-1 pb-3 relative">
-          <legend class="text-[10px] font-bold px-1 uppercase text-[#404040]">Pessoa</legend>
+          <legend class="text-[10px] font-bold px-1 uppercase text-win-text">Pessoa</legend>
 
           <!-- Pessoa selecionada -->
           <div v-if="pessoaSelecionada"
@@ -32,7 +32,7 @@
             :style="{ backgroundColor: pessoaSelecionada.sexo === 'M' ? 'var(--color-male,#c8dce8)' : 'var(--color-female,#e8c8d8)' }">
             <div>
               <p class="text-sm font-bold uppercase leading-tight">{{ pessoaSelecionada.sobrenome }}, {{ pessoaSelecionada.nome }}</p>
-              <p class="text-[10px] text-[#404040] font-mono mt-0.5">
+              <p class="text-[10px] text-win-text font-mono mt-0.5">
                 ID {{ String(pessoaSelecionada.id).padStart(3, '0') }}
                 · b.: {{ pessoaSelecionada.datanasc?.substring(0, 4) ?? '—' }}
                 <template v-if="pessoaSelecionada.datamorte"> · d.: {{ pessoaSelecionada.datamorte.substring(0, 4) }}</template>
@@ -51,19 +51,19 @@
               type="text"
               placeholder="Digite o nome ou ID para buscar..."
               @focus="focoAberto = true"
-              @blur="setTimeout(() => focoAberto = false, 150)"
-              class="bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1.5 text-sm outline-none focus:bg-[#ffffcc] w-full"
+              @blur="agendarFecharFoco"
+              class="bg-white border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white px-2 py-1.5 text-sm outline-none focus:bg-win-focus w-full"
             />
             <div v-if="focoAberto && resultados.length"
               class="absolute top-full left-0 right-0 z-30 border-2 border-t-base-300 border-l-base-300 border-r-white border-b-white bg-white max-h-52 overflow-y-auto shadow-md">
               <button
                 v-for="p in resultados" :key="p.id"
                 @mousedown.prevent="selecionar(p)"
-                class="w-full text-left px-2 py-1.5 text-xs border-b border-gray-100 hover:bg-[#000080] hover:text-white flex items-center gap-2 group">
+                class="w-full text-left px-2 py-1.5 text-xs border-b border-win-border-light hover:bg-win-navy hover:text-white flex items-center gap-2 group">
                 <span class="w-4 h-4 flex-none border border-gray-300 group-hover:border-white"
                   :style="{ backgroundColor: p.sexo === 'M' ? 'var(--color-male,#5588aa)' : 'var(--color-female,#aa5588)' }" />
                 <span class="font-bold uppercase flex-1">{{ p.sobrenome }}, {{ p.nome }}</span>
-                <span class="font-mono text-[10px] text-gray-400 group-hover:text-white">{{ p.datanasc?.substring(0, 4) ?? '?' }}</span>
+                <span class="font-mono text-[10px] text-win-dim group-hover:text-white">{{ p.datanasc?.substring(0, 4) ?? '?' }}</span>
               </button>
             </div>
             <p v-else-if="focoAberto && busca && !resultados.length"
@@ -86,7 +86,7 @@
 
         <!-- Carregando -->
         <div v-else-if="carregando"
-          class="flex-1 flex items-center justify-center text-sm text-[#404040] animate-pulse uppercase tracking-widest">
+          class="flex-1 flex items-center justify-center text-sm text-win-text animate-pulse uppercase tracking-widest">
           Carregando árvore...
         </div>
 
@@ -95,15 +95,15 @@
           class="flex-1 flex flex-col items-center justify-center gap-3">
           <Icon name="lucide:unlink" class="text-5xl text-red-400 opacity-60" />
           <p class="text-base font-bold uppercase text-red-700">Não foi possível carregar a árvore</p>
-          <p class="text-xs text-[#606060]">Tente novamente ou verifique os vínculos desta pessoa.</p>
+          <p class="text-xs text-win-muted">Tente novamente ou verifique os vínculos desta pessoa.</p>
         </div>
 
         <!-- Árvore -->
         <ClientOnly v-else-if="arvore.length">
-          <Familytree
+          <FamilyTree
             :data="arvore"
             :main="String(pessoaSelecionada!.id)"
-            :on-card-click="(id: number) => abrirFichaLayout?.(todasPessoas?.find(p => p.id === id)!)"
+            :on-card-click="(id: number) => { const p = todasPessoas?.find(x => x.id === id); if (p) abrirFichaLayout?.(p) }"
             style="width:100%;height:100%;"
           />
         </ClientOnly>
@@ -134,7 +134,7 @@
         </div>
 
         <div class="flex-none px-2 pt-1.5 pb-1">
-          <p class="text-[9px] text-[#404040] font-bold uppercase">
+          <p class="text-[9px] text-win-text font-bold uppercase">
             Clique para <span class="font-normal normal-case">selecionar e exibir a árvore</span>
           </p>
         </div>
@@ -155,13 +155,13 @@
             </thead>
             <tbody>
               <tr v-if="!pessoasFiltradas.length">
-                <td colspan="3" class="p-2 text-[9px] text-gray-400 italic text-center">Nenhuma encontrada</td>
+                <td colspan="3" class="p-2 text-[9px] text-win-dim italic text-center">Nenhuma encontrada</td>
               </tr>
               <tr
                 v-for="p in pessoasFiltradas" :key="p.id"
                 @click="selecionar(p)"
-                class="border-b border-gray-100 cursor-pointer hover:brightness-90 transition-colors"
-                :class="pessoaSelecionada?.id === p.id ? 'outline-2 outline-[#000080] -outline-offset-2' : ''"
+                class="border-b border-win-border-light cursor-pointer hover:brightness-90 transition-colors"
+                :class="pessoaSelecionada?.id === p.id ? 'outline-2 outline-win-navy -outline-offset-2' : ''"
                 :style="{ backgroundColor: p.sexo === 'M' ? 'var(--color-male)' : 'var(--color-female)' }"
               >
                 <td class="px-1 py-1 font-mono text-[9px] font-bold">{{ String(p.id).padStart(3, '0') }}</td>
@@ -183,12 +183,6 @@
 </template>
 
 <script setup lang="ts">
-interface Pessoa {
-  id: number; nome: string; sobrenome: string; sexo: string | null
-  datanasc: string | null; datamorte: string | null; databatismo: string | null
-  localnasc: number | null; localbatismo: number | null; localmorte: number | null; obs: string | null
-}
-
 const route             = useRoute()
 const abrirFichaLayout  = inject<(p: Pessoa) => void>('abrirFicha')
 
@@ -219,6 +213,8 @@ const pessoasFiltradas = computed(() => {
     (p.nome + ' ' + p.sobrenome).toLowerCase().includes(q) || String(p.id).includes(q)
   )
 })
+
+function agendarFecharFoco() { setTimeout(() => { focoAberto.value = false }, 150) }
 
 async function selecionar(p: Pessoa) {
   pessoaSelecionada.value = p

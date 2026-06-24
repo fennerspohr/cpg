@@ -1,31 +1,39 @@
-<template>
+﻿<template>
   <div
     ref="janela"
-    class="absolute pointer-events-auto bg-base-100 border-2 border-t-white border-l-white border-r-[#404040] border-b-[#404040] shadow-[2px_2px_0_#000] flex flex-col font-sans select-none"
-    :style="{ left: pos.x + 'px', top: pos.y + 'px', width: '900px', height: '620px', zIndex }"
-    @mousedown="emit('trazerParaFrente', pessoaId)"
+    class="bg-base-100 border-2 border-t-white border-l-white border-r-win-text border-b-win-text flex flex-col font-sans select-none"
+    :class="janelaReal ? 'w-screen h-screen' : 'absolute pointer-events-auto shadow-[2px_2px_0_#000]'"
+    :style="janelaReal ? undefined : { left: pos.x + 'px', top: pos.y + 'px', width: '900px', height: '620px', zIndex }"
+    @mousedown="janelaReal ? null : emit('trazerParaFrente', pessoaId)"
   >
     <!-- Barra de título -->
     <div
-      class="flex-none flex items-center justify-between px-2 py-1 mx-0.5 mt-0.5 cursor-move"
-      :class="ativa ? 'bg-[#000080]' : 'bg-[#7f7f7f]'"
-      @mousedown.prevent="iniciarDrag"
+      class="flex-none flex items-center justify-between px-2 py-1 mx-0.5 mt-0.5"
+      :class="[tituloAtivo ? 'bg-win-navy' : 'bg-win-dim', janelaReal ? '' : 'cursor-move']"
+      :style="(janelaReal ? { '-webkit-app-region': 'drag' } : undefined) as any"
+      @mousedown="onTituloMouseDown"
     >
       <span class="text-white text-sm font-bold uppercase tracking-wider flex items-center gap-2 pointer-events-none">
         <Icon name="lucide:git-fork" class="text-sm" />
         Árvore — {{ nome }}
       </span>
-      <button @click.stop="emit('fechar')"
-        class="bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 w-6 h-6 flex items-center justify-center text-sm font-bold hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white cursor-pointer"
-        style="pointer-events: all">
-        ×
-      </button>
+      <div class="flex gap-0.5"
+        :style="({ pointerEvents: 'all', ...(janelaReal ? { '-webkit-app-region': 'no-drag' } : {}) }) as any">
+        <button v-if="janelaReal" @click.stop="minimizar()"
+          class="bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 w-6 h-6 flex items-center justify-center text-sm font-bold hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white cursor-pointer">
+          -
+        </button>
+        <button @click.stop="emit('fechar')"
+          class="bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 w-6 h-6 flex items-center justify-center text-sm font-bold hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white cursor-pointer">
+          ×
+        </button>
+      </div>
     </div>
 
     <!-- Árvore -->
     <div class="flex-1 overflow-hidden">
       <div v-if="carregando"
-        class="w-full h-full flex items-center justify-center text-sm text-[#404040] animate-pulse uppercase tracking-widest bg-base-100">
+        class="w-full h-full flex items-center justify-center text-sm text-win-text animate-pulse uppercase tracking-widest bg-base-100">
         Carregando árvore...
       </div>
       <div v-else-if="erro"
@@ -33,8 +41,8 @@
         Não foi possível carregar a árvore desta pessoa.
       </div>
       <ClientOnly>
-        <Familytree
-          v-if="!carregando && !erro && arvore.length"
+        <FamilyTree
+          v-if="arvore.length"
           :data="arvore"
           :main="String(pessoaId)"
           :on-card-click="(id: number) => emit('abrirPessoa', id)"
@@ -46,19 +54,34 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   pessoaId: number
   nome: string
-  zIndex: number
-  offset: number
+  zIndex?: number
+  offset?: number
   ativa?: boolean
-}>()
+  janelaReal?: boolean
+}>(), {
+  zIndex: 110,
+  offset: 0,
+  ativa: false,
+  janelaReal: false,
+})
 
 const emit = defineEmits<{
   fechar: []
   abrirPessoa: [id: number]
   trazerParaFrente: [id: number]
 }>()
+
+const { minimizar } = useJanela()
+const tituloAtivo = computed(() => props.janelaReal || props.ativa)
+
+function onTituloMouseDown(e: MouseEvent) {
+  if (props.janelaReal) return
+  e.preventDefault()
+  iniciarDrag(e)
+}
 
 const janela     = ref<HTMLElement | null>(null)
 const pos        = ref({ x: 60 + props.offset * 25, y: 30 + props.offset * 25 })

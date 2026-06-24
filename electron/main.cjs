@@ -1,16 +1,15 @@
-const { app, BrowserWindow, dialog } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 const http = require('http')
 const fs = require('fs')
+const { pathToFileURL } = require('url')
 
 app.commandLine.appendSwitch('no-sandbox')
 
-// Load .env from the same directory as the AppImage
 function loadEnv() {
   let envPath
 
   if (app.isPackaged) {
-    // Windows: use the exe directory directly; Linux AppImage: use APPIMAGE var
     const appDir = process.env.APPIMAGE
       ? path.dirname(process.env.APPIMAGE)
       : path.dirname(app.getPath('exe'))
@@ -35,28 +34,78 @@ function loadEnv() {
   }
 }
 
-loadEnv() // ← call before anything else
-
-
+loadEnv()
 
 let mainWindow = null
-let nuxtListener = null
 const PORT = 3000
 
-// Run the Nuxt server in-process using dynamic import
+const preloadPath = path.join(__dirname, 'preload.cjs')
+
+const windowConfigs = {
+  detalhes: (p) => ({
+    width: 740, height: 700,
+    path: `/janela/detalhes?id=${p.id}`,
+  }),
+  arvore: (p) => ({
+    width: 940, height: 660,
+    path: `/janela/arvore?id=${p.id}&nome=${encodeURIComponent(p.nome || '')}`,
+  }),
+  local: () => ({
+    width: 560, height: 600,
+    path: '/janela/local',
+  }),
+  editar: (p) => ({
+    width: 900, height: 780,
+    path: `/janela/editar/${p.id}`,
+  }),
+}
+
+function createChildWindow(type, params) {
+  const cfgFn = windowConfigs[type]
+  if (!cfgFn) return
+  const cfg = cfgFn(params || {})
+
+  const win = new BrowserWindow({
+    width: cfg.width,
+    height: cfg.height,
+    frame: cfg.frame === true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: preloadPath,
+    },
+    autoHideMenuBar: true,
+  })
+
+  win.loadURL(`http://localhost:${PORT}${cfg.path}`)
+}
+
+ipcMain.on('open-window', (event, type, params) => {
+  createChildWindow(type, params)
+})
+
+ipcMain.on('minimize-window', (event) => {
+  BrowserWindow.fromWebContents(event.sender)?.minimize()
+})
+
+ipcMain.on('notify-refresh', () => {
+  if (mainWindow) mainWindow.webContents.send('do-refresh')
+})
+
+ipcMain.on('navigate-main', (event, path) => {
+  if (mainWindow) mainWindow.webContents.send('do-navigate', path)
+})
+
 async function startNuxtServer() {
   const serverPath = app.isPackaged
     ? path.join(process.resourcesPath, 'app', '.output', 'server', 'index.mjs')
     : path.join(__dirname, '..', '.output', 'server', 'index.mjs')
 
-  // Set env vars before importing
   process.env.PORT = String(PORT)
   process.env.NODE_ENV = 'production'
 
-  // Dynamically import the Nuxt server (it starts listening on import)
-  await import(serverPath)
+  await import(pathToFileURL(serverPath).href)
 
-  // Wait until it's actually responding
   await waitForServer()
 }
 
@@ -75,9 +124,7 @@ function waitForServer() {
           clearInterval(poll)
           resolve()
         }
-      }).on('error', () => {
-        // Still starting
-      })
+      }).on('error', () => {})
     }, 300)
   })
 }
@@ -89,12 +136,41 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: preloadPath,
     },
     title: 'CPG',
     autoHideMenuBar: true,
   })
 
   mainWindow.loadURL(`http://localhost:${PORT}`)
+
+  // Quando a janela principal ganha foco, traz as filhas para cima
+  // sem roubar o foco delas (moveTop não foca, só reordena o z).
+  mainWindow.on('focus', () => {
+    BrowserWindow.getAllWindows()
+      .filter(w => w !== mainWindow && !w.isMinimized())
+      .forEach(w => w.moveTop())
+  })
+
+  mainWindow.on('close', (event) => {
+    const filhas = BrowserWindow.getAllWindows().filter(w => w !== mainWindow)
+    if (filhas.length === 0) return
+
+    event.preventDefault()
+    const escolha = dialog.showMessageBoxSync(mainWindow, {
+      type: 'question',
+      buttons: ['Fechar tudo', 'Cancelar'],
+      defaultId: 0,
+      cancelId: 1,
+      title: 'Fechar CPG',
+      message: `Há ${filhas.length} janela(s) aberta(s).`,
+      detail: 'Deseja fechar todas as janelas e sair?',
+    })
+    if (escolha === 0) {
+      filhas.forEach(w => w.destroy())
+      mainWindow.destroy()
+    }
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null

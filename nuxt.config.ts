@@ -9,6 +9,15 @@ export default defineNuxtConfig({
     databaseUrl: process.env.DATABASE_URL
   },
 
+  components: {
+    dirs: [
+      { path: '~/components/layout',  pathPrefix: false },
+      { path: '~/components/janelas', pathPrefix: false },
+      { path: '~/components/ui',      pathPrefix: false },
+      { path: '~/components/charts',  pathPrefix: false },
+    ],
+  },
+
   modules: [
     // REMOVIDO: '@nuxthub/core'  ← era esse o culpado
     '@nuxt/icon'

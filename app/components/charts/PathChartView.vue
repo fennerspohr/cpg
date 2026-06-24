@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import PathChart from './Pathchart.vue';
+import PathChart from './PathChart.vue';
 
 export default {
   name: 'PathChartView',

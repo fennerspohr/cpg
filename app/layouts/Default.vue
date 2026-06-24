@@ -1,23 +1,20 @@
 <template>
   <div class="flex flex-col h-screen overflow-hidden">
     <Navbar
-      @open-cities="modalCidadeAberto = true"
-      @abrir-busca-relacao="abrirBuscaRelacao()"
+      @open-cities="abrirCidades"
     />
 
     <main class="flex-1 overflow-hidden">
       <slot />
     </main>
 
-    <ModalLocal v-if="modalCidadeAberto" @close="modalCidadeAberto = false" />
-
     <div class="fixed inset-0 pointer-events-none z-50">
-      <JanelaBuscaRelacao
-        v-if="buscaRelacaoAberta"
-        :z-index="300"
-        :pessoa-inicial="pessoaInicialBusca"
-        @fechar="fecharBuscaRelacao"
-        @abrir-pessoa="abrirFicha"
+      <ModalLocal
+        v-if="modalCidadeAberto"
+        :z-index="zIndexDe('local')"
+        :ativa="topoZOrdem === 'local'"
+        @close="fecharCidades"
+        @trazer-para-frente="trazerParaFrente('local')"
       />
 
       <JanelaDetalhes
@@ -30,7 +27,7 @@
         @fechar="fecharFicha(p.id)"
         @abrir-pessoa="abrirFicha"
         @excluir="excluirPessoa"
-        @editar="(id) => { fecharFicha(p.id); router.push('/editar/' + id) }"
+        @editar="(id) => editarPessoa(p.id, id)"
         @ver-arvore="abrirArvore"
         @trazer-para-frente="trazerParaFrente('f-' + $event)"
       />
@@ -52,25 +49,14 @@
 </template>
 
 <script setup lang="ts">
-interface Pessoa {
-  id: number
-  nome: string
-  sobrenome: string
-  sexo: string | null
-  datanasc: string | null
-  datamorte: string | null
-  databatismo: string | null
-  localnasc: number | null
-  localbatismo: number | null
-  localmorte: number | null
-  obs: string | null
-}
+const router = useRouter()
+const { abrir, aoReceberNavegacao } = useJanela()
 
-const router             = useRouter()
-const modalCidadeAberto  = ref(false)
-const buscaRelacaoAberta = ref(false)
-const pessoaInicialBusca = ref<Pessoa | null>(null)
-const fichasAbertas      = ref<Pessoa[]>([])
+const pararNavegacao = aoReceberNavegacao((path) => router.push(path))
+onUnmounted(() => pararNavegacao?.())
+
+const modalCidadeAberto = ref(false)
+const fichasAbertas     = ref<Pessoa[]>([])
 const arvoresAbertas     = ref<{ id: number; nome: string }[]>([])
 
 // z-order unificado — chaves: 'f-ID' para fichas, 'a-ID' para árvores
@@ -101,8 +87,13 @@ function abrirFicha(p: Pessoa) {
 
 async function abrirFichaPorId(id: number) {
   const lista = await $fetch<Pessoa[]>('/api/pessoa', { query: { nome: String(id) } })
-  const p = lista?.find((x: any) => x.id === id)
+  const p = lista?.find(x => x.id === id)
   if (p) abrirFicha(p)
+}
+
+function editarPessoa(fichaId: number, pessoaId: number) {
+  fecharFicha(fichaId)
+  router.push('/editar/' + pessoaId)
 }
 
 function fecharFicha(id: number) {
@@ -115,19 +106,27 @@ async function excluirPessoa(id: number) {
     await $fetch('/api/pessoa', { method: 'DELETE', body: { id } })
     fecharFicha(id)
     mutacaoContador.value++
-  } catch (err: any) {
-    alert('Erro ao excluir: ' + (err.data?.message || err.message || 'Tente novamente.'))
+  } catch (err) {
+    const msg = (err as { data?: { message?: string }; message?: string })?.data?.message
+      ?? (err instanceof Error ? err.message : 'Tente novamente.')
+    alert('Erro ao excluir: ' + msg)
   }
 }
 
-function abrirBuscaRelacao(pessoa?: Pessoa) {
-  pessoaInicialBusca.value = pessoa ?? null
-  buscaRelacaoAberta.value = true
+function abrirCidades() {
+  // No Electron abre janela real; no navegador cai na janela flutuante embutida.
+  if (abrir('local')) return
+  if (modalCidadeAberto.value) {
+    trazerParaFrente('local')
+    return
+  }
+  modalCidadeAberto.value = true
+  zOrdem.value.push('local')
 }
 
-function fecharBuscaRelacao() {
-  buscaRelacaoAberta.value = false
-  pessoaInicialBusca.value = null
+function fecharCidades() {
+  modalCidadeAberto.value = false
+  zOrdem.value = zOrdem.value.filter(z => z !== 'local')
 }
 
 function abrirArvore(id: number) {
@@ -147,8 +146,6 @@ function fecharArvore(id: number) {
 }
 
 provide('abrirFicha', abrirFicha)
-provide('abrirBuscaRelacao', abrirBuscaRelacao)
-
 const mutacaoContador = ref(0)
 provide('mutacaoContador', mutacaoContador)
 </script>

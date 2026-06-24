@@ -1,5 +1,5 @@
-<template>
-  <div class="h-full flex flex-col font-sans bg-[#c0c0c0]">
+﻿<template>
+  <div class="h-full flex flex-col font-sans bg-win-bg">
 
     <!-- Barra de título -->
     <div class="flex-none flex items-center justify-between bg-primary border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-1.5 mx-3 mt-3 mb-2">
@@ -46,12 +46,12 @@
         </thead>
         <tbody>
           <tr v-if="pending">
-            <td colspan="6" class="py-10 text-center text-xs uppercase animate-pulse bg-white text-[#606060] tracking-widest">
+            <td colspan="6" class="py-10 text-center text-xs uppercase animate-pulse bg-white text-win-muted tracking-widest">
               Buscando no banco de dados...
             </td>
           </tr>
           <tr v-else-if="!sortedPeople.length">
-            <td colspan="6" class="py-14 text-center text-sm italic bg-white text-gray-400">
+            <td colspan="6" class="py-14 text-center text-sm italic bg-white text-win-dim">
               Nenhum registro encontrado.
             </td>
           </tr>
@@ -59,11 +59,11 @@
             v-else
             v-for="p in sortedPeople"
             :key="p.id"
-            @click="abrirFicha?.(p)"
+            @click="abrirPessoa(p)"
             class="cursor-pointer border-b border-base-300 hover:brightness-95 active:brightness-90 transition-[filter]"
             :style="{ backgroundColor: p.sexo === 'M' ? 'var(--color-male)' : 'var(--color-female)' }"
           >
-            <td class="px-2 py-2 text-center font-mono text-xs font-bold text-[#404040] border-r border-base-300">
+            <td class="px-2 py-2 text-center font-mono text-xs font-bold text-win-text border-r border-base-300">
               {{ String(p.id).padStart(3, '0') }}
             </td>
             <td class="px-3 py-2 font-bold uppercase text-sm text-black border-r border-base-300 truncate">
@@ -72,15 +72,15 @@
             <td class="px-3 py-2 text-sm text-black border-r border-base-300 truncate">
               {{ p.nome }}
             </td>
-            <td class="px-2 py-2 text-xs font-mono text-center border-r border-base-300 text-[#303030]">
+            <td class="px-2 py-2 text-xs font-mono text-center border-r border-base-300 text-win-text">
               {{ p.datanasc?.substring(0, 4) ?? '—' }}
             </td>
             <td class="px-2 py-2 text-xs font-mono text-center border-r border-base-300"
-              :class="p.datamorte ? 'text-[#505050]' : 'text-[#b8b8b8]'">
+              :class="p.datamorte ? 'text-win-muted-dark' : 'text-win-dim'">
               {{ p.datamorte?.substring(0, 4) ?? '—' }}
             </td>
             <td class="px-2 py-2 text-xs text-center font-semibold border-r border-base-300"
-              :class="p.sexo === 'M' ? 'text-blue-800' : p.sexo === 'F' ? 'text-pink-800' : 'text-gray-400'">
+              :class="p.sexo === 'M' ? 'text-blue-800' : p.sexo === 'F' ? 'text-pink-800' : 'text-win-dim'">
               {{ p.sexo === 'M' ? 'Masc.' : p.sexo === 'F' ? 'Fem.' : '?' }}
             </td>
           </tr>
@@ -110,20 +110,6 @@
 </template>
 
 <script setup lang="ts">
-interface Pessoa {
-  id: number
-  nome: string
-  sobrenome: string
-  sexo: string | null
-  datanasc: string | null
-  datamorte: string | null
-  databatismo: string | null
-  localnasc: number | null
-  localbatismo: number | null
-  localmorte: number | null
-  obs: string | null
-}
-
 type SortField = keyof Pessoa
 type SortDir   = 'asc' | 'desc'
 
@@ -133,14 +119,28 @@ const router = useRouter()
 const abrirFicha      = inject<(p: Pessoa) => void>('abrirFicha')
 const mutacaoContador = inject<Ref<number>>('mutacaoContador')
 
+const { abrir, aoReceberRefresh } = useJanela()
+
+// No Electron abre janela real; no navegador cai no modal embutido do layout.
+function abrirPessoa(p: Pessoa) {
+  if (!abrir('detalhes', { id: p.id, nome: p.nome })) {
+    abrirFicha?.(p)
+  }
+}
+
+// Janelas filhas avisam (ex.: após excluir) para recarregar a lista.
+onMounted(() => {
+  const off = aoReceberRefresh(() => refresh())
+  if (off) onUnmounted(off)
+})
+
 const sort = ref<{ field: SortField; dir: SortDir }>({ field: 'id', dir: 'asc' })
 
-const { data: people, refresh, pending } = await useFetch<Pessoa[]>(
-  () => route.query.q ? `/api/pessoa?nome=${route.query.q}` : '/api/pessoa',
-  { watch: [() => route.query.q] }
-)
+const { data: people, refresh, pending } = await useFetch<Pessoa[]>('/api/pessoa', {
+  query: computed(() => route.query.q ? { nome: route.query.q } : {}),
+})
 
-watch(mutacaoContador!, () => refresh())
+watch(mutacaoContador ?? ref(0), () => refresh())
 
 const sortedPeople = computed(() => {
   if (!people.value) return []
