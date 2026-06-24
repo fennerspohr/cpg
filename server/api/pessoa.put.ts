@@ -1,6 +1,6 @@
 import { db } from '../utils/drizzle';
 import { pessoa, relacao } from "../db/schema"
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -43,9 +43,20 @@ async function updateRelations(id: number, currentRelations: Relacao[]) {
       })
     }
   }
+  console.log(previousRelations)
 
   // relações que não vieram no payload — deletar
   for (const r of previousRelations) {
     await db.delete(relacao).where(eq(relacao.id, r.id))
+    if(r.rel == 1)
+    {
+      await db.delete(relacao).where(and(eq(relacao.p1, r.p2), eq(relacao.p2, id), eq(relacao.rel, 3)))
+    }
+    else if(r.rel == 2){
+      await db.delete(relacao).where(and(eq(relacao.p1, r.p2), eq(relacao.p2, id), eq(relacao.rel, 2)))
+    }
+    else if(r.rel == 3){
+      await db.delete(relacao).where(and(eq(relacao.p1, r.p2), eq(relacao.p2, id), eq(relacao.rel, 1)))
+    }
   }
 }
