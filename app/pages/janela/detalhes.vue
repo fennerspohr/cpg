@@ -20,7 +20,7 @@
 definePageMeta({ layout: 'janela' })
 
 const route = useRoute()
-const { abrir, fechar, notificarRefresh } = useJanela()
+const { abrir, fechar, notificarRefresh, navegarNaJanelaPrincipal } = useJanela()
 
 const id = Number(route.query.id)
 
@@ -36,7 +36,7 @@ function abrirArvore(pid: number) {
 }
 
 function editar(pid: number) {
-  abrir('editar', { id: pid })
+  navegarNaJanelaPrincipal('/editar/' + pid)
   fechar()
 }
 
