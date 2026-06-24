@@ -342,6 +342,14 @@ function fecharComConfirmacao() {
 }
 
 async function handleSubmit() {
+  const incompletos = form.value.relacoes.filter(
+    r => r.isNovo && (!r.novoParente.nome?.trim() || !r.novoParente.sobrenome?.trim())
+  )
+  if (incompletos.length) {
+    alert('Preencha nome e sobrenome de todos os novos parentes antes de salvar.')
+    return
+  }
+
   const ok = confirm('Tem certeza que deseja salvar as alterações?')
   if (!ok) return
 
