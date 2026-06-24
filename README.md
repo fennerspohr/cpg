@@ -5,6 +5,15 @@
 - dist-electron/win-unpacked/
 ├── CPG.exe
 └── .env    ← here
+
+# INSTALADOR
+1. Dentro da pasta Instalador, adicionar o .exe de instalação do postgres 17.10
+2. Buildar o app pelo Electron (pra Windows) e copiar a pasta dist-electron gerada para dentro da pasta Instalador
+3. Baixar o Inno Setup
+4. Abrir o arquivo .iss pelo Inno e buildar. O instalador estará na pasta Output
+
+Link do instalador já gerado: https://drive.google.com/drive/folders/1-dCxv5x0aHlv4hN2ewuH_ZgDWzda136o?usp=sharing
+
 # To do
 
 - [x] Banco de dados;
@@ -15,10 +24,10 @@
 - [x] Visualização em lista de pessoas;
   - [x] Pesquisar por nome, sobrenome;
 - [x] Visualizar pessoa;
-- [ ] Atualizar dados de pessoa;
-- [ ] Visualização em árvore;
-- [ ] Buscar relação entre duas pessoas (função twopoint_search);
-- [ ] Botão de backup (download de arquivos do postgres);
+- [x] Atualizar dados de pessoa;
+- [x] Visualização em árvore;
+- [x] Buscar relação entre duas pessoas (função twopoint_search);
+- [x] Botão de backup (download de arquivos do postgres);
 - [ ] Relatório;
 - [ ] Manual de uso;
 
