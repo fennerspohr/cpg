@@ -50,8 +50,7 @@ export default defineEventHandler(async (event) => {
     'c',
     '--no-owner',
     '--no-acl',
-    '--data-only',
-    '-f'
+    '--data-only'
   ], {
     env: { ...process.env, PGPASSWORD: url.password },
   });
