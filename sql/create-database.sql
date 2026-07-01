@@ -1,12 +1,12 @@
 CREATE SCHEMA "drizzle";
 CREATE TABLE "local" (
 	"id" serial PRIMARY KEY,
-	"descricao" varchar(100) NOT NULL,
+	"descricao" varchar(255) NOT NULL,
 	"estado" varchar(100)
 );
 CREATE TABLE "pessoa" (
 	"id" serial PRIMARY KEY,
-	"nome" varchar(100) NOT NULL,
+	"nome" varchar(255) NOT NULL,
 	"sexo" char(1),
 	"datanasc" date,
 	"localnasc" integer,
@@ -16,7 +16,7 @@ CREATE TABLE "pessoa" (
 	"localmorte" integer,
 	"obs" text,
 	"creation_time" timestamp DEFAULT now() NOT NULL,
-	"sobrenome" varchar(100) NOT NULL
+	"sobrenome" varchar(255) NOT NULL
 );
 CREATE TABLE "relacao" (
 	"p1" integer NOT NULL,

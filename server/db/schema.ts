@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 
 export const local = pgTable("local", {
   id: serial("id").primaryKey(),
-  descricao: varchar("descricao", { length: 100 }).notNull(),
+  descricao: varchar("descricao", { length: 255 }).notNull(),
   estado: varchar("estado", { length: 100 }),
 });
 
@@ -14,8 +14,8 @@ export const tipoRelacao = pgTable("tipo_relacao", {
 
 export const pessoa = pgTable("pessoa", {
   id: serial("id").primaryKey(),
-  nome: varchar("nome", { length: 100 }).notNull(),
-  sobrenome: varchar("sobrenome", { length: 100 }).notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  sobrenome: varchar("sobrenome", { length: 255 }).notNull(),
   sexo: char("sexo", { length: 1 }),
   datanasc: date("datanasc"),
   localnasc: integer("localnasc").references(() => local.id),
