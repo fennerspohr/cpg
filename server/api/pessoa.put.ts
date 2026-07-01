@@ -29,21 +29,16 @@ interface Relacao { id?: number; p1?: number; p2: number; rel: number; metadata:
 
 async function updateRelations(id: number, currentRelations: Relacao[]) {
   const previousRelations = await db.select().from(relacao).where(eq(relacao.p1, id))
+  const insertRelations: Array<Relacao> = []
 
   for (const r of currentRelations) {
     const foundIdx = previousRelations.findIndex(rel => rel.id === r.id)
     if (foundIdx !== -1) {
       previousRelations.splice(foundIdx, 1)
     } else {
-      await db.insert(relacao).values({
-        p1: id,
-        p2: r.p2,
-        rel: r.rel,
-        metadata: r.metadata
-      })
+      insertRelations.push(r)
     }
   }
-  console.log(previousRelations)
 
   // relações que não vieram no payload — deletar
   for (const r of previousRelations) {
@@ -58,5 +53,15 @@ async function updateRelations(id: number, currentRelations: Relacao[]) {
     else if(r.rel == 3){
       await db.delete(relacao).where(and(eq(relacao.p1, r.p2), eq(relacao.p2, id), eq(relacao.rel, 1)))
     }
+  }
+
+  //relacoes novas - adicionar
+  for(const r of insertRelations){
+          await db.insert(relacao).values({
+        p1: id,
+        p2: r.p2,
+        rel: r.rel,
+        metadata: r.metadata
+      })
   }
 }
