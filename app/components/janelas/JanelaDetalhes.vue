@@ -277,6 +277,11 @@
         Excluir
       </button>
       <div class="flex gap-1.5">
+        <button @click="gerarRelatorio" :disabled="gerandoRelatorio"
+          class="text-[10px] uppercase font-bold px-4 py-1.5 bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-wait">
+          <Icon :name="gerandoRelatorio ? 'lucide:loader' : 'lucide:file-text'" class="text-[10px]" :class="gerandoRelatorio ? 'animate-spin' : ''" />
+          {{ gerandoRelatorio ? 'Gerando...' : 'Relatório' }}
+        </button>
         <button @click="emit('fechar')"
           class="text-[10px] uppercase font-bold px-4 py-1.5 bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 hover:brightness-110 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white">
           Fechar
@@ -459,6 +464,31 @@ const todosParentes = computed(() => {
 function confirmarExclusao() {
   if (confirm(`Excluir ${props.pessoa.nome} ${props.pessoa.sobrenome}?\n\nEsta ação não pode ser desfeita. Todos os vínculos desta pessoa também serão removidos.`)) {
     emit('excluir', props.pessoa.id)
+  }
+}
+
+const gerandoRelatorio = ref(false)
+
+async function gerarRelatorio() {
+  gerandoRelatorio.value = true
+  try {
+    const resp = await fetch(`/api/relatorio/descendentes?id=${props.pessoa.id}`)
+    if (!resp.ok) throw new Error('Erro ao gerar relatório')
+    const blob = await resp.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const disposition = resp.headers.get('Content-Disposition') ?? ''
+    const match = disposition.match(/filename="([^"]+)"/)
+    a.download = match?.[1] ?? `descendentes_${props.pessoa.sobrenome}.docx`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch {
+    alert('Não foi possível gerar o relatório.')
+  } finally {
+    gerandoRelatorio.value = false
   }
 }
 </script>
