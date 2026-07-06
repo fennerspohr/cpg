@@ -137,11 +137,18 @@
           </p>
         </div>
         <template v-else-if="resultado?.length">
-          <div class="flex-none border-b-2 border-base-300 px-4 py-1.5 bg-base-300 flex items-center gap-2">
-            <Icon name="lucide:check-circle" class="text-green-700 text-sm" />
-            <span class="text-xs font-bold uppercase text-black">
-              Caminho encontrado — {{ resultado.length }} pessoa(s) na linha de parentesco
-            </span>
+          <div class="flex-none border-b-2 border-base-300 px-4 py-1.5 bg-base-300 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <Icon name="lucide:check-circle" class="text-green-700 text-sm" />
+              <span class="text-xs font-bold uppercase text-black">
+                Caminho encontrado — {{ resultado.length }} pessoa(s) na linha de parentesco
+              </span>
+            </div>
+            <button @click="gerarRelatorio" :disabled="gerandoRelatorio"
+              class="border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 bg-base-100 px-3 py-0.5 text-[10px] font-bold uppercase hover:brightness-110 disabled:opacity-50 disabled:cursor-wait flex items-center gap-1.5 active:border-t-base-300 active:border-l-base-300 active:border-r-white active:border-b-white">
+              <Icon :name="gerandoRelatorio ? 'lucide:loader' : 'lucide:file-text'" class="text-[10px]" :class="gerandoRelatorio ? 'animate-spin' : ''" />
+              {{ gerandoRelatorio ? 'Gerando...' : 'Gerar Relatório' }}
+            </button>
           </div>
           <div class="flex-1 overflow-auto">
             <ClientOnly>
@@ -341,6 +348,32 @@ async function buscarRelacao() {
 
 function abrirFicha(p: any) {
   if (abrirFichaLayout) abrirFichaLayout(p as Pessoa)
+}
+
+const gerandoRelatorio = ref(false)
+
+async function gerarRelatorio() {
+  if (!pessoa1.value || !pessoa2.value) return
+  gerandoRelatorio.value = true
+  try {
+    const resp = await fetch(`/api/relatorio/caminho?id1=${pessoa1.value.id}&id2=${pessoa2.value.id}`)
+    if (!resp.ok) throw new Error('Erro ao gerar relatório')
+    const blob = await resp.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const disposition = resp.headers.get('Content-Disposition') ?? ''
+    const match = disposition.match(/filename="([^"]+)"/)
+    a.download = match?.[1] ?? 'parentesco.docx'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch {
+    alert('Não foi possível gerar o relatório.')
+  } finally {
+    gerandoRelatorio.value = false
+  }
 }
 </script>
 
