@@ -31,7 +31,7 @@
     </div>
 
     <!-- Árvore -->
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1 overflow-hidden relative">
       <div v-if="carregando"
         class="w-full h-full flex items-center justify-center text-sm text-win-text animate-pulse uppercase tracking-widest bg-base-100">
         Carregando árvore...
@@ -49,6 +49,10 @@
           style="width:100%;height:100%;min-height:560px;"
         />
       </ClientOnly>
+      <div v-if="carregandoMais"
+        class="absolute bottom-2 right-2 bg-base-100 border-2 border-t-white border-l-white border-r-base-300 border-b-base-300 px-3 py-1 text-[10px] font-bold uppercase animate-pulse pointer-events-none">
+        Expandindo árvore...
+      </div>
     </div>
   </div>
 </template>
@@ -83,11 +87,12 @@ function onTituloMouseDown(e: MouseEvent) {
   iniciarDrag(e)
 }
 
-const janela     = ref<HTMLElement | null>(null)
-const pos        = ref({ x: 60 + props.offset * 25, y: 30 + props.offset * 25 })
-const carregando = ref(true)
-const erro       = ref(false)
-const arvore     = ref<any[]>([])
+const janela         = ref<HTMLElement | null>(null)
+const pos            = ref({ x: 60 + props.offset * 25, y: 30 + props.offset * 25 })
+const carregando     = ref(true)
+const carregandoMais = ref(false)
+const erro           = ref(false)
+const arvore         = ref<any[]>([])
 
 let dragging   = false
 let startMouse = { x: 0, y: 0 }
@@ -125,18 +130,36 @@ onUnmounted(() => {
 })
 
 onMounted(async () => {
+  // Carrega em 3 profundidades: diretos → próximos → completo
+  const PROFUNDIDADES = [1, 5, 99999]
   try {
-    const data = await $fetch<any[]>('/api/arvore/', { query: { id: props.pessoaId } })
-    if (!data?.length) {
-      erro.value = true
-    } else {
-      arvore.value = data
+    for (const depth of PROFUNDIDADES) {
+      const dados = await $fetch<any[]>('/api/arvore/', {
+        query: { id: props.pessoaId, depth }
+      })
+
+      if (!dados?.length) {
+        if (!arvore.value.length) erro.value = true
+        break
+      }
+
+      const temNovos = dados.length > arvore.value.length
+      arvore.value   = dados   // cada profundidade inclui as anteriores
+      carregando.value = false  // mostra o que chegou
+
+      if (!temNovos) break  // árvore completa, para
+
+      if (depth !== 99999) {
+        carregandoMais.value = true
+        await new Promise(r => setTimeout(r, 250))
+      }
     }
   } catch (e) {
     console.error('Erro ao carregar árvore:', e)
-    erro.value = true
+    if (!arvore.value.length) erro.value = true
   } finally {
-    carregando.value = false
+    carregando.value     = false
+    carregandoMais.value = false
   }
 })
 </script>

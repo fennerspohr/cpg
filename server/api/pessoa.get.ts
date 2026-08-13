@@ -30,8 +30,9 @@ export default defineEventHandler(async (event) => {
       );
       return response.rows;
     } else {
+      const depth = query.depth ? Number(query.depth) : 99999
       const response = await db.execute(
-        sql`SELECT * FROM tree_search(${pessoaID}::int)`
+        sql`SELECT * FROM tree_search(${pessoaID}::int, ${depth}::int)`
       );
       return response.rows;
     }

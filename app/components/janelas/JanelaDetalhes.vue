@@ -382,14 +382,27 @@ onUnmounted(() => {
 })
 
 // Dados 
-const { data: familiaRaw,   pending: carregando } = await useFetch<any[]>(() => `/api/pessoa?id=${props.pessoa.id}`)
+const { data: familiaRaw,   pending: carregando } = await useFetch<any[]>(() => `/api/pessoa?id=${props.pessoa.id}&depth=1`)
 const { data: relacoesRaw }                      = await useFetch<any[]>(() => `/api/relacao?id=${props.pessoa.id}`)
 const { data: todosLocais  }                     = await useFetch<any[]>('/api/local')
 const { data: tiposRelacao }                     = await useFetch<any[]>('/api/tipo_relacao')
-const { data: todasPessoas }                     = await useFetch<any[]>('/api/pessoa')
 
-const localMap  = computed(() => Object.fromEntries((todosLocais.value  ?? []).map((l: any) => [l.id, l])))
-const pessoaMap = computed(() => Object.fromEntries((todasPessoas.value ?? []).map((p: any) => [p.id, p])))
+// Busca só as pessoas que aparecem nas relações desta pessoa, não todas
+const idsNecessarios = computed(() => {
+  const ids = new Set<number>([props.pessoa.id])
+  for (const r of (relacoesRaw.value ?? [])) {
+    ids.add(Number(r.p1))
+    ids.add(Number(r.p2))
+  }
+  return [...ids]
+})
+const { data: pessoasEnvolvidas } = await useFetch<any[]>(
+  () => `/api/pessoa/por-ids?ids=${idsNecessarios.value.join(',')}`,
+  { watch: [idsNecessarios] }
+)
+
+const localMap  = computed(() => Object.fromEntries((todosLocais.value    ?? []).map((l: any) => [l.id, l])))
+const pessoaMap = computed(() => Object.fromEntries((pessoasEnvolvidas.value ?? []).map((p: any) => [p.id, p])))
 const tipoMap   = computed(() => Object.fromEntries((tiposRelacao.value ?? []).map((t: any) => [t.id, t.descricao])))
 // relacao keyed by p2 (only type 2 = cônjuge) so we can look up wedding metadata
 const metadataCasamento = computed(() => {

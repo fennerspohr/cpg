@@ -6,6 +6,8 @@ export default defineEventHandler(async (event) => {
     const pessoaID = Number(query.id);
     const pessoaID2 = Number(query.id2)
 
+const depth = query.depth ? Number(query.depth) : 99999
+
 if (pessoaID2) {
   const response = await db.execute(
     sql`SELECT * FROM parse_twopoint(${pessoaID}::int, ${pessoaID2}::int)`
@@ -77,7 +79,7 @@ return data;
 }
     else{
         const response = await db.execute(
-            sql`SELECT * FROM parse_tree(${pessoaID})`
+            sql`SELECT * FROM parse_tree(${pessoaID}, ${depth})`
         )
 
         const pessoas = response.rows[0].info

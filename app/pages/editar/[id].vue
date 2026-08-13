@@ -416,7 +416,7 @@ function removerRelacao(index: number) { form.value.relacoes.splice(index, 1) }
 function verificarSeEhConjuge(idRelacao: number | null): boolean {
   if (!idRelacao || !tiposRelacao.value) return false
   const tipo = tiposRelacao.value.find((t: any) => t.id === idRelacao)
-  return tipo?.descricao?.toLowerCase() === 'cônjuge'
+  return tipo?.descricao?.toLowerCase() === 'conjuge'
 }
 
 async function handleSubmit() {

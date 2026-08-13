@@ -23,7 +23,7 @@ function formatarData(d: string | null): string {
 }
 
 function notacaoFilho(pai: string, i: number): string {
-  return pai === '1' ? `2.${i}` : `${pai}.${i}`
+  return `${pai}.${i}`
 }
 
 export default defineEventHandler(async (event) => {
