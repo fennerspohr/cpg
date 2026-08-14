@@ -208,14 +208,8 @@
 <script setup lang="ts">
 const { data: d, pending, refresh } = await useFetch('/api/estatisticas')
 
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-
-function formatarData(s: string | null): string {
-  if (!s) return '—'
-  const dt = new Date(s)
-  dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset())
-  return `${String(dt.getDate()).padStart(2, '0')} ${MESES[dt.getMonth()]} ${dt.getFullYear()}`
-}
+const { formatarData: _formatarData } = useFormatarData()
+function formatarData(s: string | null): string { return _formatarData(s) ?? '—' }
 
 // ── Cards de resumo ───────────────────────────────────────────────────
 const cards = computed(() => {

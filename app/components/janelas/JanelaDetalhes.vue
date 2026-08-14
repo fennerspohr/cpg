@@ -419,21 +419,7 @@ function resolverLocal(id: number | null): string | null {
   return l ? `${l.descricao}${l.estado ? ' - ' + l.estado : ''}` : null
 }
 
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-
-function formatarData(data: string | null): string | null {
-  if (!data) return null
-  const d = new Date(data)
-  d.setMinutes(d.getMinutes() + d.getTimezoneOffset())
-  return `${String(d.getDate()).padStart(2, '0')} ${MESES[d.getMonth()]} ${d.getFullYear()}`
-}
-
-function anoVida(nasc?: string | null, morte?: string | null): string {
-  const n = nasc?.substring(0, 4)
-  const m = morte?.substring(0, 4)
-  if (!n) return '?'
-  return m ? `${n} – ${m}` : `${n} –`
-}
+const { formatarData, anoVida } = useFormatarData()
 
 function corCard(sexo?: string | null): { backgroundColor: string } {
   return { backgroundColor: sexo === 'M' ? 'var(--color-male, #c8dce8)' : sexo === 'F' ? 'var(--color-female, #e8c8d8)' : '#e8e8e8' }
